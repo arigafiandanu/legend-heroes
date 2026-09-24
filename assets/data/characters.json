@@ -1,0 +1,22 @@
+[
+  {
+    "id": "kael",
+    "name": "Kael",
+    "sheet": "kael_sheet.png",
+    "stats": { "hp": 220, "sp": 40, "atk": 34, "def": 28, "eatk": 18, "edef": 18, "spd": 24 },
+    "hpGrowth": 0.07,
+    "statGrowth": 0.05,
+    "weapons": ["sword", "spear"],
+    "elements": ["fire", "lightning"]
+  },
+  {
+    "id": "lira",
+    "name": "Lira",
+    "sheet": "lira_sheet.png",
+    "stats": { "hp": 170, "sp": 70, "atk": 22, "def": 20, "eatk": 32, "edef": 30, "spd": 28 },
+    "hpGrowth": 0.07,
+    "statGrowth": 0.05,
+    "weapons": ["staff", "dagger"],
+    "elements": ["ice", "wind", "light"]
+  }
+]

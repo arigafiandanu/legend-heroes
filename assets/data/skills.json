@@ -1,0 +1,19 @@
+[
+  { "id": "ember_slash", "owner": "kael", "learnLevel": 1, "name": { "en": "Ember Slash", "id": "Ember Slash" },
+    "sp": 8, "types": ["sword", "fire"], "target": "singleEnemy", "effect": "damage", "power": 1.5 },
+  { "id": "cross_thrust", "owner": "kael", "learnLevel": 3, "name": { "en": "Cross Thrust", "id": "Cross Thrust" },
+    "sp": 10, "types": ["spear"], "target": "singleEnemy", "effect": "damage", "power": 0.8, "hits": 2 },
+  { "id": "thunder_edge", "owner": "kael", "learnLevel": 6, "name": { "en": "Thunder Edge", "id": "Thunder Edge" },
+    "sp": 14, "types": ["lightning"], "target": "allEnemies", "effect": "damage", "power": 1.2 },
+  { "id": "crest_breaker", "owner": "kael", "learnLevel": 13, "name": { "en": "Crest Breaker", "id": "Crest Breaker" },
+    "sp": 24, "types": ["sword"], "target": "singleEnemy", "effect": "damage", "power": 1.0, "hits": 3 },
+
+  { "id": "heal", "owner": "lira", "learnLevel": 1, "name": { "en": "Heal", "id": "Heal" },
+    "sp": 6, "types": [], "target": "singleAlly", "effect": "heal", "power": 2.0 },
+  { "id": "frost_needle", "owner": "lira", "learnLevel": 1, "name": { "en": "Frost Needle", "id": "Frost Needle" },
+    "sp": 7, "types": ["ice"], "target": "singleEnemy", "effect": "damage", "power": 1.3 },
+  { "id": "gale_dance", "owner": "lira", "learnLevel": 4, "name": { "en": "Gale Dance", "id": "Gale Dance" },
+    "sp": 12, "types": ["wind"], "target": "randomEnemies", "effect": "damage", "power": 1.0, "hits": 2 },
+  { "id": "radiant_bloom", "owner": "lira", "learnLevel": 11, "name": { "en": "Radiant Bloom", "id": "Radiant Bloom" },
+    "sp": 22, "types": ["light"], "target": "allEnemies", "effect": "damage", "power": 1.4 }
+]
