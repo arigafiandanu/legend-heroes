@@ -49,3 +49,7 @@ app.*.map.json
 
 # Superpowers scratch
 .superpowers/
+
+# Music tooling (large soundfont, re-download via tools/music/README.md)
+tools/music/soundfonts/
+tools/music/out/
