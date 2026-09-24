@@ -2,6 +2,8 @@ import 'package:ashen_crest/domain/attack_type.dart';
 import 'package:ashen_crest/domain/battle/battle_engine.dart';
 import 'package:ashen_crest/domain/battle/battle_event.dart';
 import 'package:ashen_crest/domain/battle/battle_unit.dart';
+import 'package:ashen_crest/domain/inventory.dart';
+import 'package:ashen_crest/domain/item.dart';
 import 'package:ashen_crest/domain/skill.dart';
 import 'package:ashen_crest/presentation/battle/battle_cubit.dart';
 import 'package:ashen_crest/presentation/battle/battle_state.dart';
@@ -29,9 +31,12 @@ const thunderEdge = Skill(
   power: 1.2,
 );
 
+const herbal = ItemDef(id: 'herbal', names: {'en': 'Herbal'}, kind: ItemKind.consumable, effect: ItemEffect.healHp, amount: 100);
+const feather = ItemDef(id: 'bulu_bara', names: {'en': 'Ember Feather'}, kind: ItemKind.consumable, effect: ItemEffect.revive, amount: 50);
+
 class Harness {
-  Harness({List<BattleUnit>? party, List<BattleUnit>? enemies})
-      : cubit = BattleCubit(BattleEngine(
+  Harness({List<BattleUnit>? party, List<BattleUnit>? enemies, Inventory? inventory, List<String> Function(BattleOutcome)? onOutcome})
+      : cubit = BattleCubit(onOutcome: onOutcome, BattleEngine(
           party: party ??
               [
                 hero('kael',
@@ -40,6 +45,8 @@ class Harness {
               ],
           enemies: enemies ?? [foe('rat', s: stats(hp: 9999, spd: 10))],
           random: FixedRandom(),
+          inventory: inventory,
+          items: const {'herbal': herbal, 'bulu_bara': feather},
         )) {
     cubit.playback.listen(played.add);
   }
@@ -193,5 +200,48 @@ void main() {
     expect(outcome.phase, BattlePhase.victory);
     expect(outcome.exp, 8);
     expect(outcome.keping, 6);
+  });
+
+  test('items menu lists usable items; targets are allies the item helps', () async {
+    final inv = Inventory()..add('herbal')..add('bulu_bara');
+    final lira = hero('lira', s: stats(spd: 20));
+    final h = Harness(party: [hero('kael', s: stats(spd: 30)), lira], inventory: inv)..cubit.start();
+    await h.settle();
+    lira.hp = 0;
+
+    h.cubit.openItems();
+    expect(h.cubit.state.menu, BattleMenu.items);
+    expect(h.cubit.usableItems.map((i) => i.id), ['herbal', 'bulu_bara']);
+
+    h.cubit.chooseItem(feather);
+    expect(h.cubit.state.menu, BattleMenu.targets);
+    expect(h.cubit.targets.map((u) => u.id), ['lira']);
+
+    h.cubit.chooseTarget('lira');
+    await pumpEventQueue();
+    expect(h.lastPlayed.whereType<Revived>().single.unitId, 'lira');
+    expect(inv.count('bulu_bara'), 0);
+  });
+
+  test('back from item targets returns to the item list', () async {
+    final inv = Inventory()..add('herbal');
+    final h = Harness(inventory: inv)..cubit.start();
+    await h.settle();
+    h.cubit.openItems();
+    h.cubit.chooseItem(herbal);
+    h.cubit.back();
+    expect(h.cubit.state.menu, BattleMenu.items);
+  });
+
+  test('onOutcome adds notes (level ups) to the result', () async {
+    final h = Harness(
+      enemies: [foe('rat', s: stats(hp: 1, spd: 10), exp: 8)],
+      onOutcome: (o) => ['Kael reached Lv 2!'],
+    )..cubit.start();
+    await h.settle();
+    h.cubit.openAttack();
+    h.cubit.chooseTarget('rat');
+    await h.settle();
+    expect(h.cubit.state.outcome!.notes, ['Kael reached Lv 2!']);
   });
 }

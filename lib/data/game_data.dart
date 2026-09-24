@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
+import '../domain/attack_type.dart';
 import '../domain/battle/battle_unit.dart';
 import '../domain/character_def.dart';
 import '../domain/encounter.dart';
@@ -87,7 +88,7 @@ class GameData {
   }
 
   /// [index] disambiguates duplicates of the same enemy in one battle.
-  BattleUnit enemyUnit(String enemyId, {required int index}) {
+  BattleUnit enemyUnit(String enemyId, {required int index, Set<AttackType> revealed = const {}}) {
     final def = enemies[enemyId]!;
     return BattleUnit.enemy(
       id: '$enemyId#$index',
@@ -99,6 +100,18 @@ class GameData {
       isBoss: def.isBoss,
       exp: def.exp,
       keping: def.keping,
+      revealed: revealed,
     );
   }
+
+  /// Battle unit for a persistent party member (current HP/SP, learned skills).
+  BattleUnit memberUnit(PartyMember m) => BattleUnit.party(
+        id: m.id,
+        name: m.def.name,
+        stats: m.stats,
+        weapons: m.def.weapons,
+        skills: skillsFor(m.id, m.level),
+        hp: m.hp,
+        sp: m.sp,
+      );
 }

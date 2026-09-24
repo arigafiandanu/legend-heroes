@@ -21,9 +21,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get menuButton => 'Menu';
 
   @override
-  String get testBattleButton => 'Tes Battle';
-
-  @override
   String get cmdAttack => 'Serang';
 
   @override
@@ -112,4 +109,101 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get boostTitle => 'Boost';
+
+  @override
+  String get titleSubtitle => 'Chapter 1: Ashen Crest';
+
+  @override
+  String get titleNewGame => 'Mulai Baru';
+
+  @override
+  String get titleContinue => 'Lanjutkan';
+
+  @override
+  String get titleLoad => 'Muat';
+
+  @override
+  String get menuParty => 'Party';
+
+  @override
+  String get menuItems => 'Item';
+
+  @override
+  String get menuClose => 'Tutup';
+
+  @override
+  String get menuQuitToTitle => 'Kembali ke Judul';
+
+  @override
+  String levelLabel(int level) {
+    return 'Lv $level';
+  }
+
+  @override
+  String expToNext(int exp) {
+    return 'Level berikut: $exp EXP';
+  }
+
+  @override
+  String get useOn => 'Pakai ke siapa?';
+
+  @override
+  String get noItems => 'Tidak ada item.';
+
+  @override
+  String get saveTitle => 'Simpan';
+
+  @override
+  String get loadTitle => 'Muat';
+
+  @override
+  String get slotEmpty => 'Kosong';
+
+  @override
+  String get slotAuto => 'Simpan otomatis';
+
+  @override
+  String slotManual(int n) {
+    return 'Slot $n';
+  }
+
+  @override
+  String get saved => 'Permainan disimpan.';
+
+  @override
+  String foundItem(String item, int count) {
+    return 'Menemukan $item ×$count';
+  }
+
+  @override
+  String get chestEmpty => 'Peti ini kosong.';
+
+  @override
+  String levelUp(String name, int level) {
+    return '$name naik ke Lv $level!';
+  }
+
+  @override
+  String get gameOverTitle => 'Game Over';
+
+  @override
+  String get gameOverLoad => 'Muat simpanan terakhir';
+
+  @override
+  String get gameOverToTitle => 'Kembali ke judul';
+
+  @override
+  String get mapHollowmere => 'Hollowmere';
+
+  @override
+  String get mapWhisperwood => 'Whisperwood';
+
+  @override
+  String get dangerLow => 'Aman';
+
+  @override
+  String get dangerMedium => 'Waspada';
+
+  @override
+  String get dangerHigh => 'Bahaya';
 }

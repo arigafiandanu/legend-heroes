@@ -88,6 +88,11 @@ class _ResultOverlay extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(l10n.victoryRewards(outcome.exp, outcome.keping),
                     style: const TextStyle(color: HudColors.text, fontSize: 15)),
+                for (final note in outcome.notes)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(note, style: const TextStyle(color: HudColors.ember, fontWeight: FontWeight.w800)),
+                  ),
               ],
               const SizedBox(height: 18),
               FilledButton(

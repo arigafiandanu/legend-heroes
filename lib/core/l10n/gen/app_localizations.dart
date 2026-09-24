@@ -122,12 +122,6 @@ abstract class AppLocalizations {
   /// **'Menu'**
   String get menuButton;
 
-  /// No description provided for @testBattleButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Test Battle'**
-  String get testBattleButton;
-
   /// No description provided for @cmdAttack.
   ///
   /// In en, this message translates to:
@@ -295,6 +289,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Boost'**
   String get boostTitle;
+
+  /// No description provided for @titleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chapter 1: Ashen Crest'**
+  String get titleSubtitle;
+
+  /// No description provided for @titleNewGame.
+  ///
+  /// In en, this message translates to:
+  /// **'New Game'**
+  String get titleNewGame;
+
+  /// No description provided for @titleContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get titleContinue;
+
+  /// No description provided for @titleLoad.
+  ///
+  /// In en, this message translates to:
+  /// **'Load'**
+  String get titleLoad;
+
+  /// No description provided for @menuParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Party'**
+  String get menuParty;
+
+  /// No description provided for @menuItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get menuItems;
+
+  /// No description provided for @menuClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get menuClose;
+
+  /// No description provided for @menuQuitToTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quit to Title'**
+  String get menuQuitToTitle;
+
+  /// No description provided for @levelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Lv {level}'**
+  String levelLabel(int level);
+
+  /// No description provided for @expToNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next level: {exp} EXP'**
+  String expToNext(int exp);
+
+  /// No description provided for @useOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Use on whom?'**
+  String get useOn;
+
+  /// No description provided for @noItems.
+  ///
+  /// In en, this message translates to:
+  /// **'No items.'**
+  String get noItems;
+
+  /// No description provided for @saveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveTitle;
+
+  /// No description provided for @loadTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Load'**
+  String get loadTitle;
+
+  /// No description provided for @slotEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty'**
+  String get slotEmpty;
+
+  /// No description provided for @slotAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-save'**
+  String get slotAuto;
+
+  /// No description provided for @slotManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Slot {n}'**
+  String slotManual(int n);
+
+  /// No description provided for @saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Game saved.'**
+  String get saved;
+
+  /// No description provided for @foundItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Found {item} ×{count}'**
+  String foundItem(String item, int count);
+
+  /// No description provided for @chestEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'The chest is empty.'**
+  String get chestEmpty;
+
+  /// No description provided for @levelUp.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} reached Lv {level}!'**
+  String levelUp(String name, int level);
+
+  /// No description provided for @gameOverTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Game Over'**
+  String get gameOverTitle;
+
+  /// No description provided for @gameOverLoad.
+  ///
+  /// In en, this message translates to:
+  /// **'Load last save'**
+  String get gameOverLoad;
+
+  /// No description provided for @gameOverToTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to title'**
+  String get gameOverToTitle;
+
+  /// No description provided for @mapHollowmere.
+  ///
+  /// In en, this message translates to:
+  /// **'Hollowmere'**
+  String get mapHollowmere;
+
+  /// No description provided for @mapWhisperwood.
+  ///
+  /// In en, this message translates to:
+  /// **'Whisperwood'**
+  String get mapWhisperwood;
+
+  /// No description provided for @dangerLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Safe'**
+  String get dangerLow;
+
+  /// No description provided for @dangerMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Careful'**
+  String get dangerMedium;
+
+  /// No description provided for @dangerHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Danger'**
+  String get dangerHigh;
 }
 
 class _AppLocalizationsDelegate

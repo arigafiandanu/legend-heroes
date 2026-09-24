@@ -201,7 +201,7 @@
     <property name="sheet" value="lira_sheet.png"/>
     <property name="tint" value="#8FB0E0"/>
     <property name="facing" value="right"/>
-    <property name="wander" value="1"/>
+    <property name="wander" type="int" value="1"/>
    </properties>
    <point/>
   </object>
@@ -222,7 +222,7 @@
   <object id="85" name="chest_1" class="chest" x="48" y="288" width="16" height="16">
    <properties>
     <property name="item" value="herbal"/>
-    <property name="count" value="2"/>
+    <property name="count" type="int" value="2"/>
    </properties>
   </object>
   <object id="86" name="sign_east" class="sign" x="384" y="176" width="16" height="16">

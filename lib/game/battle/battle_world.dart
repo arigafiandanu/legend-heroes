@@ -37,7 +37,7 @@ class BattleWorld extends World with HasGameReference<AshenCrestGame> {
   static const _enemySlots = [
     [Offset(170, 125)],
     [Offset(185, 105), Offset(115, 140)],
-    [Offset(190, 95), Offset(115, 118), Offset(195, 142)],
+    [Offset(205, 84), Offset(115, 118), Offset(205, 152)],
     [Offset(190, 90), Offset(115, 105), Offset(195, 135), Offset(120, 150)],
   ];
   static const _partySlots = [Offset(370, 105), Offset(405, 148)];

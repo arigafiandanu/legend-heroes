@@ -184,19 +184,19 @@
   <object id="73" name="chest_a" class="chest" x="288" y="352" width="16" height="16">
    <properties>
     <property name="item" value="herbal"/>
-    <property name="count" value="2"/>
+    <property name="count" type="int" value="2"/>
    </properties>
   </object>
   <object id="74" name="chest_b" class="chest" x="640" y="80" width="16" height="16">
    <properties>
     <property name="item" value="tonik"/>
-    <property name="count" value="1"/>
+    <property name="count" type="int" value="1"/>
    </properties>
   </object>
   <object id="75" name="chest_c" class="chest" x="464" y="288" width="16" height="16">
    <properties>
     <property name="item" value="bulu_bara"/>
-    <property name="count" value="1"/>
+    <property name="count" type="int" value="1"/>
    </properties>
   </object>
   <object id="76" name="sign_post" class="sign" x="720" y="176" width="16" height="16">

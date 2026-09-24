@@ -32,12 +32,14 @@ class _FloatingJoystickState extends State<FloatingJoystick> {
     var d = e.localPosition - _origin!;
     if (d.distance > widget.radius) d = d / d.distance * widget.radius;
     widget.input.joystick.setValues(d.dx / widget.radius, d.dy / widget.radius);
-    setState(() => _knob = d);
+    if (mounted) setState(() => _knob = d);
   }
 
   void _up(PointerEvent e) {
     if (e.pointer != _pointer) return;
     widget.input.joystick.setZero();
+    // The overlay can be removed mid-drag (a battle starts); still release.
+    if (!mounted) return;
     setState(() {
       _pointer = null;
       _origin = null;

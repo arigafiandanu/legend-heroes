@@ -6,7 +6,7 @@ import '../theme.dart';
 import 'floating_joystick.dart';
 
 /// Overworld touch controls: floating joystick (left half), Action + Run
-/// (bottom right), Menu (top right). Menu and Action are stubs until M2.
+/// (bottom right), Menu (top right).
 class ControlsOverlay extends StatelessWidget {
   const ControlsOverlay({super.key, required this.game});
 
@@ -30,13 +30,7 @@ class ControlsOverlay extends StatelessWidget {
             top: 12,
             child: Row(
               children: [
-                _PillButton(
-                  label: l10n.testBattleButton,
-                  icon: Icons.bolt,
-                  onTap: () => game.startBattle(AshenCrestGame.testBattleEnemies, l10n),
-                ),
-                const SizedBox(width: 10),
-                _PillButton(label: l10n.menuButton, icon: Icons.menu, onTap: () {}),
+                _PillButton(label: l10n.menuButton, icon: Icons.menu, onTap: game.openMenu),
               ],
             ),
           ),

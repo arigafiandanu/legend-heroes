@@ -22,5 +22,7 @@ ffmpeg -hide_banner -loglevel error -y -i "out/$name.raw.wav" \
   -af "volume=${gain}dB,alimiter=limit=0.891:attack=2:release=60:level=disabled:latency=1" -c:a pcm_s16le "out/$name.loop.wav"
 peak=$(ffmpeg -hide_banner -i "out/$name.loop.wav" -af volumedetect -f null - 2>&1 | sed -n 's/.*max_volume: \(-\{0,1\}[0-9.]*\) dB.*/\1/p')
 ffmpeg -hide_banner -loglevel error -y -i "out/$name.loop.wav" -c:a libvorbis -q:a 5 "../../assets/audio/bgm/$name.ogg"
+# iOS (audioplayers/AVPlayer) cannot decode Ogg Vorbis: ship AAC too.
+ffmpeg -hide_banner -loglevel error -y -i "out/$name.loop.wav" -c:a aac -b:a 160k -movflags +faststart "../../assets/audio/bgm/$name.m4a"
 ffmpeg -hide_banner -loglevel error -y -stream_loop 1 -i "out/$name.loop.wav" -c:a libmp3lame -q:a 2 "out/$name.preview-2x.mp3"
 echo "$name: ${lufs} -> ${target} LUFS (gain ${gain}dB, peak ${peak}dB) -> assets/audio/bgm/$name.ogg"

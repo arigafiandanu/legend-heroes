@@ -14,6 +14,13 @@ T = tiles.T
 ID, SOLID = tiles.ID, tiles.SOLID
 
 
+def _prop(name, value):
+    """Tiled property; ints/bools get their type so the game can read them."""
+    kind = ' type="bool"' if isinstance(value, bool) else ' type="int"' if isinstance(value, int) else ""
+    text = str(value).lower() if isinstance(value, bool) else str(value)
+    return f'    <property name="{name}"{kind} value={quoteattr(text)}/>'
+
+
 class MapBuilder:
     def __init__(self, name, w, h, props, seed):
         self.name, self.w, self.h, self.props = name, w, h, props
@@ -132,7 +139,7 @@ class MapBuilder:
             out.append(f'  <object id="{oid}" name={quoteattr(name)} class="{cls}" x="{x}" y="{y}"{size}>')
             if props:
                 out.append("   <properties>")
-                out += [f'    <property name="{k}" value={quoteattr(str(v))}/>' for k, v in props.items()]
+                out += [_prop(k, v) for k, v in props.items()]
                 out.append("   </properties>")
             if not (w or h):
                 out.append("   <point/>")

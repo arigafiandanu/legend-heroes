@@ -65,6 +65,7 @@ void main() {
       test('chests hold known items', () {
         for (final o in objects(m).where((o) => o.type == 'chest')) {
           expect(gameData.items.containsKey(o.properties.getValue<String>('item')), isTrue, reason: o.name);
+          expect(o.properties.getValue<int>('count'), greaterThan(0), reason: '${o.name}: count must be an int property');
         }
       });
 

@@ -7,6 +7,7 @@ import '../../domain/battle/battle_action.dart';
 import '../../domain/battle/battle_engine.dart';
 import '../../domain/battle/battle_event.dart';
 import '../../domain/battle/battle_unit.dart';
+import '../../domain/item.dart';
 import '../../domain/skill.dart';
 import 'battle_state.dart';
 
@@ -16,7 +17,7 @@ import 'battle_state.dart';
 /// reports each one via [onEventPlayed], then calls [playbackDone]. HUD
 /// numbers follow playback ([shownHp] …), not the engine's final state.
 class BattleCubit extends Cubit<BattleViewState> {
-  BattleCubit(this.engine) : super(const BattleViewState()) {
+  BattleCubit(this.engine, {this.onOutcome}) : super(const BattleViewState()) {
     for (final u in engine.units) {
       _hp[u.id] = u.hp;
       _sp[u.id] = u.sp;
@@ -25,6 +26,9 @@ class BattleCubit extends Cubit<BattleViewState> {
   }
 
   final BattleEngine engine;
+
+  /// Called once when the battle ends; returns extra lines for the result.
+  final List<String> Function(BattleOutcome outcome)? onOutcome;
   final _playback = StreamController<List<BattleEvent>>.broadcast();
   final Map<String, int> _hp = {};
   final Map<String, int> _sp = {};
@@ -64,16 +68,16 @@ class BattleCubit extends Cubit<BattleViewState> {
   void playbackDone() {
     if (isClosed) return;
     if (engine.isOver) {
+      if (state.outcome != null) return;
       final victory = _lastVictory;
-      emit(state.copyWith(
-        busy: false,
-        announcement: () => null,
-        outcome: BattleOutcome(
-          phase: engine.phase,
-          exp: victory?.exp ?? 0,
-          keping: victory?.keping ?? 0,
-        ),
-      ));
+      var outcome = BattleOutcome(
+        phase: engine.phase,
+        exp: victory?.exp ?? 0,
+        keping: victory?.keping ?? 0,
+      );
+      final notes = onOutcome?.call(outcome) ?? const [];
+      outcome = BattleOutcome(phase: outcome.phase, exp: outcome.exp, keping: outcome.keping, notes: notes);
+      emit(state.copyWith(busy: false, announcement: () => null, outcome: outcome));
     } else if (engine.awaitingPlayer) {
       emit(BattleViewState(busy: false, revision: state.revision + 1));
     } else {
@@ -88,8 +92,13 @@ class BattleCubit extends Cubit<BattleViewState> {
 
   bool canUse(Skill skill) => (actor?.sp ?? 0) >= skill.spCost;
 
-  /// Valid targets for the pending Attack/Skill.
+  List<ItemDef> get usableItems => engine.usableItems;
+  int itemCount(String id) => engine.inventory?.count(id) ?? 0;
+
+  /// Valid targets for the pending Attack/Skill/Item.
   List<BattleUnit> get targets {
+    final item = state.pendingItem;
+    if (item != null) return [for (final u in engine.party) if (item.canUseOn(u)) u];
     final allies = state.pendingSkill?.target == SkillTarget.singleAlly;
     return [
       for (final u in allies ? engine.party : engine.enemies)
@@ -115,9 +124,19 @@ class BattleCubit extends Cubit<BattleViewState> {
         menu: BattleMenu.targets,
         pendingWeapon: () => weapon,
         pendingSkill: () => null,
+        pendingItem: () => null,
       ));
 
-  void openSkills() => emit(state.copyWith(menu: BattleMenu.skills));
+  void openSkills() => emit(state.copyWith(menu: BattleMenu.skills, pendingItem: () => null));
+
+  void openItems() => emit(state.copyWith(menu: BattleMenu.items, pendingSkill: () => null));
+
+  void chooseItem(ItemDef item) => emit(state.copyWith(
+        menu: BattleMenu.targets,
+        pendingItem: () => item,
+        pendingSkill: () => null,
+        pendingWeapon: () => null,
+      ));
 
   void chooseSkill(Skill skill) {
     if (!canUse(skill)) return;
@@ -127,6 +146,7 @@ class BattleCubit extends Cubit<BattleViewState> {
           menu: BattleMenu.targets,
           pendingSkill: () => skill,
           pendingWeapon: () => null,
+          pendingItem: () => null,
         ));
       case SkillTarget.allEnemies || SkillTarget.randomEnemies:
         _submit(SkillAction(skill: skill, boost: state.boost));
@@ -134,6 +154,8 @@ class BattleCubit extends Cubit<BattleViewState> {
   }
 
   void chooseTarget(String id) {
+    final item = state.pendingItem;
+    if (item != null) return _submit(ItemAction(itemId: item.id, targetId: id));
     final skill = state.pendingSkill;
     _submit(skill != null
         ? SkillAction(skill: skill, targetId: id, boost: state.boost)
@@ -148,6 +170,7 @@ class BattleCubit extends Cubit<BattleViewState> {
 
   void back() {
     final menu = switch (state.menu) {
+      BattleMenu.targets when state.pendingItem != null => BattleMenu.items,
       BattleMenu.targets when state.pendingSkill != null => BattleMenu.skills,
       BattleMenu.targets when (actor?.weapons.length ?? 0) > 1 => BattleMenu.weapons,
       _ => BattleMenu.root,

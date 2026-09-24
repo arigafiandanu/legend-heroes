@@ -4,7 +4,6 @@
   "actionButton": "Action",
   "runButton": "Run",
   "menuButton": "Menu",
-  "testBattleButton": "Test Battle",
   "cmdAttack": "Attack",
   "cmdSkill": "Skill",
   "cmdItem": "Item",
@@ -56,5 +55,75 @@
   "typeLightning": "Lightning",
   "typeWind": "Wind",
   "typeLight": "Light",
-  "boostTitle": "Boost"
+  "boostTitle": "Boost",
+  "titleSubtitle": "Chapter 1: Ashen Crest",
+  "titleNewGame": "New Game",
+  "titleContinue": "Continue",
+  "titleLoad": "Load",
+  "menuParty": "Party",
+  "menuItems": "Items",
+  "menuClose": "Close",
+  "menuQuitToTitle": "Quit to Title",
+  "levelLabel": "Lv {level}",
+  "@levelLabel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "expToNext": "Next level: {exp} EXP",
+  "@expToNext": {
+    "placeholders": {
+      "exp": {
+        "type": "int"
+      }
+    }
+  },
+  "useOn": "Use on whom?",
+  "noItems": "No items.",
+  "saveTitle": "Save",
+  "loadTitle": "Load",
+  "slotEmpty": "Empty",
+  "slotAuto": "Auto-save",
+  "slotManual": "Slot {n}",
+  "@slotManual": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "saved": "Game saved.",
+  "foundItem": "Found {item} ×{count}",
+  "@foundItem": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chestEmpty": "The chest is empty.",
+  "levelUp": "{name} reached Lv {level}!",
+  "@levelUp": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "gameOverTitle": "Game Over",
+  "gameOverLoad": "Load last save",
+  "gameOverToTitle": "Back to title",
+  "mapHollowmere": "Hollowmere",
+  "mapWhisperwood": "Whisperwood",
+  "dangerLow": "Safe",
+  "dangerMedium": "Careful",
+  "dangerHigh": "Danger"
 }

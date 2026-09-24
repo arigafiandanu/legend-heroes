@@ -52,7 +52,7 @@ class CommandMenu extends StatelessWidget {
         return _Grid(columns: 3, children: [
           _Cmd(l10n.cmdAttack, onTap: cubit.openAttack),
           _Cmd(l10n.cmdSkill, onTap: actor.skills.isEmpty ? null : cubit.openSkills),
-          _Cmd(l10n.cmdItem), // inventory arrives in M2
+          _Cmd(l10n.cmdItem, onTap: cubit.usableItems.isEmpty ? null : cubit.openItems),
           _Cmd(l10n.cmdDefend, onTap: cubit.defend),
           _Cmd(l10n.cmdFlee, onTap: cubit.canFlee ? cubit.flee : null),
         ]);
@@ -69,6 +69,17 @@ class CommandMenu extends StatelessWidget {
               trailing: l10n.spCost(s.spCost),
               detail: _skillDetail(s, l10n),
               onTap: cubit.canUse(s) ? () => cubit.chooseSkill(s) : null,
+            ),
+          _Cmd(l10n.cmdBack, onTap: cubit.back, subtle: true),
+        ]);
+      case BattleMenu.items:
+        return Column(children: [
+          for (final item in cubit.usableItems)
+            _Cmd(
+              item.name(l10n.localeName),
+              trailing: '×${cubit.itemCount(item.id)}',
+              detail: item.description(l10n.localeName),
+              onTap: cubit.engine.party.any(item.canUseOn) ? () => cubit.chooseItem(item) : null,
             ),
           _Cmd(l10n.cmdBack, onTap: cubit.back, subtle: true),
         ]);
