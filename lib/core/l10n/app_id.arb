@@ -12,8 +12,6 @@
   "cmdFlee": "Kabur",
   "cmdBack": "Kembali",
   "cmdConfirm": "Oke",
-  "boostLabel": "Boost {bp}",
-  "chooseTarget": "Pilih target",
   "roundLabel": "Ronde {round}",
   "nextRoundLabel": "Berikut",
   "spCost": "{sp} SP",
@@ -25,5 +23,14 @@
   "escapedTitle": "Berhasil kabur",
   "escapeFailed": "Gagal kabur!",
   "continueButton": "Lanjut",
-  "enemyTurn": "Giliran {name}"
+  "typeSword": "Pedang",
+  "typeSpear": "Tombak",
+  "typeStaff": "Tongkat",
+  "typeDagger": "Belati",
+  "typeFire": "Api",
+  "typeIce": "Es",
+  "typeLightning": "Petir",
+  "typeWind": "Angin",
+  "typeLight": "Cahaya",
+  "boostTitle": "Boost"
 }

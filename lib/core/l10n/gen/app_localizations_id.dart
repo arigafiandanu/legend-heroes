@@ -45,14 +45,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get cmdConfirm => 'Oke';
 
   @override
-  String boostLabel(int bp) {
-    return 'Boost $bp';
-  }
-
-  @override
-  String get chooseTarget => 'Pilih target';
-
-  @override
   String roundLabel(int round) {
     return 'Ronde $round';
   }
@@ -92,7 +84,32 @@ class AppLocalizationsId extends AppLocalizations {
   String get continueButton => 'Lanjut';
 
   @override
-  String enemyTurn(String name) {
-    return 'Giliran $name';
-  }
+  String get typeSword => 'Pedang';
+
+  @override
+  String get typeSpear => 'Tombak';
+
+  @override
+  String get typeStaff => 'Tongkat';
+
+  @override
+  String get typeDagger => 'Belati';
+
+  @override
+  String get typeFire => 'Api';
+
+  @override
+  String get typeIce => 'Es';
+
+  @override
+  String get typeLightning => 'Petir';
+
+  @override
+  String get typeWind => 'Angin';
+
+  @override
+  String get typeLight => 'Cahaya';
+
+  @override
+  String get boostTitle => 'Boost';
 }

@@ -45,14 +45,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cmdConfirm => 'Confirm';
 
   @override
-  String boostLabel(int bp) {
-    return 'Boost $bp';
-  }
-
-  @override
-  String get chooseTarget => 'Choose a target';
-
-  @override
   String roundLabel(int round) {
     return 'Round $round';
   }
@@ -92,7 +84,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get continueButton => 'Continue';
 
   @override
-  String enemyTurn(String name) {
-    return '$name\'s turn';
-  }
+  String get typeSword => 'Sword';
+
+  @override
+  String get typeSpear => 'Spear';
+
+  @override
+  String get typeStaff => 'Staff';
+
+  @override
+  String get typeDagger => 'Dagger';
+
+  @override
+  String get typeFire => 'Fire';
+
+  @override
+  String get typeIce => 'Ice';
+
+  @override
+  String get typeLightning => 'Lightning';
+
+  @override
+  String get typeWind => 'Wind';
+
+  @override
+  String get typeLight => 'Light';
+
+  @override
+  String get boostTitle => 'Boost';
 }

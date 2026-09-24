@@ -170,18 +170,6 @@ abstract class AppLocalizations {
   /// **'Confirm'**
   String get cmdConfirm;
 
-  /// No description provided for @boostLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Boost {bp}'**
-  String boostLabel(int bp);
-
-  /// No description provided for @chooseTarget.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose a target'**
-  String get chooseTarget;
-
   /// No description provided for @roundLabel.
   ///
   /// In en, this message translates to:
@@ -248,11 +236,65 @@ abstract class AppLocalizations {
   /// **'Continue'**
   String get continueButton;
 
-  /// No description provided for @enemyTurn.
+  /// No description provided for @typeSword.
   ///
   /// In en, this message translates to:
-  /// **'{name}\'s turn'**
-  String enemyTurn(String name);
+  /// **'Sword'**
+  String get typeSword;
+
+  /// No description provided for @typeSpear.
+  ///
+  /// In en, this message translates to:
+  /// **'Spear'**
+  String get typeSpear;
+
+  /// No description provided for @typeStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Staff'**
+  String get typeStaff;
+
+  /// No description provided for @typeDagger.
+  ///
+  /// In en, this message translates to:
+  /// **'Dagger'**
+  String get typeDagger;
+
+  /// No description provided for @typeFire.
+  ///
+  /// In en, this message translates to:
+  /// **'Fire'**
+  String get typeFire;
+
+  /// No description provided for @typeIce.
+  ///
+  /// In en, this message translates to:
+  /// **'Ice'**
+  String get typeIce;
+
+  /// No description provided for @typeLightning.
+  ///
+  /// In en, this message translates to:
+  /// **'Lightning'**
+  String get typeLightning;
+
+  /// No description provided for @typeWind.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind'**
+  String get typeWind;
+
+  /// No description provided for @typeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get typeLight;
+
+  /// No description provided for @boostTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Boost'**
+  String get boostTitle;
 }
 
 class _AppLocalizationsDelegate

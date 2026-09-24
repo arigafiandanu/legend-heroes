@@ -12,23 +12,49 @@
   "cmdFlee": "Flee",
   "cmdBack": "Back",
   "cmdConfirm": "Confirm",
-  "boostLabel": "Boost {bp}",
-  "@boostLabel": { "placeholders": { "bp": { "type": "int" } } },
-  "chooseTarget": "Choose a target",
   "roundLabel": "Round {round}",
-  "@roundLabel": { "placeholders": { "round": { "type": "int" } } },
+  "@roundLabel": {
+    "placeholders": {
+      "round": {
+        "type": "int"
+      }
+    }
+  },
   "nextRoundLabel": "Next",
   "spCost": "{sp} SP",
-  "@spCost": { "placeholders": { "sp": { "type": "int" } } },
+  "@spCost": {
+    "placeholders": {
+      "sp": {
+        "type": "int"
+      }
+    }
+  },
   "breakText": "BREAK",
   "weakText": "WEAK",
   "victoryTitle": "Victory!",
   "victoryRewards": "{exp} EXP · {keping} Keping",
-  "@victoryRewards": { "placeholders": { "exp": { "type": "int" }, "keping": { "type": "int" } } },
+  "@victoryRewards": {
+    "placeholders": {
+      "exp": {
+        "type": "int"
+      },
+      "keping": {
+        "type": "int"
+      }
+    }
+  },
   "defeatTitle": "Defeated...",
   "escapedTitle": "Got away safely",
   "escapeFailed": "Couldn't escape!",
   "continueButton": "Continue",
-  "enemyTurn": "{name}'s turn",
-  "@enemyTurn": { "placeholders": { "name": { "type": "String" } } }
+  "typeSword": "Sword",
+  "typeSpear": "Spear",
+  "typeStaff": "Staff",
+  "typeDagger": "Dagger",
+  "typeFire": "Fire",
+  "typeIce": "Ice",
+  "typeLightning": "Lightning",
+  "typeWind": "Wind",
+  "typeLight": "Light",
+  "boostTitle": "Boost"
 }
