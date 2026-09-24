@@ -110,7 +110,10 @@ def main():
 
     end = len(HARMONY) * BAR + int(TAIL_SECONDS * BPM / 60 * smf.TPQ)
     smf.write("out/hollowmere.mid", tracks, BPM, BEATS, end_tick=end)
-    print(f"loop length: {len(HARMONY) * BEATS * 60 / BPM:.3f}s")
+    seconds = len(HARMONY) * BEATS * 60 / BPM
+    with open("out/hollowmere.len", "w") as f:
+        f.write(f"{seconds:.6f}\n")
+    print(f"hollowmere: {len(HARMONY)} bars, loop {seconds:.3f}s")
 
 
 if __name__ == "__main__":
