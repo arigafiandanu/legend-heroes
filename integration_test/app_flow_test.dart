@@ -88,5 +88,21 @@ void main() {
     expect(game.battle, isNull);
     expect(game.overworld.player.position, spot);
     expect(find.text('Test Battle'), findsOneWidget);
+
+    // A second battle must work too; flee until it succeeds (60% per try).
+    await tester.tap(find.text('Test Battle'));
+    await until(tester, () => game.battle != null && !game.battle!.state.busy);
+    final second = game.battle!;
+    expect(second, isNot(same(cubit)));
+    while (second.state.outcome == null) {
+      await tester.tap(find.text('Flee'));
+      await until(tester, () => second.state.outcome != null || !second.state.busy);
+    }
+    expect(second.state.outcome!.phase, anyOf(BattlePhase.escaped, BattlePhase.defeat));
+    await run(tester, 600);
+    await tester.tap(find.text('Continue'));
+    await run(tester, 800);
+    expect(game.battle, isNull);
+    expect(game.overworld.player.position, spot);
   });
 }
