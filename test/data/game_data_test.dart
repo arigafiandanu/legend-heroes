@@ -42,6 +42,13 @@ void main() {
           [170, 70, 22, 20, 32, 30, 28]);
     });
 
+    test('Seren (guest) stats match the spec and she only carries a dagger', () {
+      final seren = data.characters['seren']!;
+      final b = seren.base;
+      expect([b.hp, b.sp, b.atk, b.def, b.eatk, b.edef, b.spd], [190, 55, 30, 22, 26, 24, 34]);
+      expect(seren.weapons, [AttackType.dagger]);
+    });
+
     test('party units carry the character weapons, first is the default', () {
       final lira = data.partyUnit('lira', level: 1);
       expect(lira.weapons, [AttackType.staff, AttackType.dagger]);
@@ -56,6 +63,15 @@ void main() {
       expect(data.skillsFor('kael', 6).map((s) => s.id),
           ['ember_slash', 'cross_thrust', 'thunder_edge']);
       expect(data.skillsFor('lira', 1).map((s) => s.id), ['heal', 'frost_needle']);
+    });
+
+    test("Seren's damage skills unlock by level (debuffs arrive with M4)", () {
+      expect(data.skillsFor('seren', 1).map((s) => s.id), ['shadow_stab']);
+      expect(data.skillsFor('seren', 10).map((s) => s.id),
+          ['shadow_stab', 'gale_cut', 'rime_flurry']);
+      final stab = data.skills['shadow_stab']!;
+      expect(stab.hits, 2);
+      expect(stab.power, 0.7);
     });
 
     test('Ember Slash is sword + fire, 8 SP, power 1.5', () {

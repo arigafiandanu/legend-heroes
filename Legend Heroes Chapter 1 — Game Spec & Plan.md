@@ -29,6 +29,7 @@ Premis: Ashen Crest, bara suci di kuil desa Hollowmere, retak dalam semalam. Sej
 
 - **Kael (19)** — penjaga muda desa, pendekar pedang. Keras kepala dan protektif, tapi diam-diam ragu apakah dirinya cukup kuat.
 - **Lira (18)** — teman masa kecil Kael, murid tabib desa. Ceria dan tenang di bawah tekanan. Chapter 1 menanam petunjuk bahwa Lira punya hubungan dengan api Crest.
+- **Seren (22)** — karakter tamu. Pemburu relik yang juga mengejar pecahan Crest. Sinis, cekatan, dan selalu selangkah di depan. Ia muncul sebagai rival di tambang, bekerja sama melawan Ironhide Mole, ikut sampai Cinder Warden, lalu pergi mengejar sosok berjubah. Ia bisa direkrut kembali di chapter berikutnya.
 
 **Alur beat cerita**
 
@@ -38,9 +39,9 @@ Premis: Ashen Crest, bara suci di kuil desa Hollowmere, retak dalam semalam. Sej
 | 2 | Tetua desa meminta Kael mencari pecahan; Lira memaksa ikut | Hollowmere | 5 menit |
 | 3 | Perjalanan menembus hutan, tutorial weakness & Break | Whisperwood | 20 menit |
 | 4 | Bertemu pedagang yang terluka, side quest opsional | Pos Whisperwood | 10 menit |
-| 5 | Tambang tua: puzzle tuas, mini-boss, tutorial Boost | Old Emberline Mine | 25 menit |
+| 5 | Tambang tua: puzzle tuas, bertemu Seren di lantai 2 (ia bergabung sementara), mini-boss, tutorial Boost | Old Emberline Mine | 25 menit |
 | 6 | Boss: Cinder Warden menjaga pecahan Crest | Mine Depths | 10 menit |
-| 7 | Lira menyentuh pecahan dan bara menyala di tangannya; sosok berjubah mengamati | Mine Depths | 5 menit |
+| 7 | Lira menyentuh pecahan dan bara menyala di tangannya; sosok berjubah mengamati, Seren pergi mengejarnya | Mine Depths | 5 menit |
 | 8 | Kembali ke desa, Crest pulih sebagian, hook chapter 2 | Hollowmere | 5 menit |
 
 Total sekitar 90 menit termasuk side quest di beat 4; grinding dan eksplorasi ekstra menambah 10–20 menit.
@@ -69,6 +70,7 @@ Loop kecil (eksplor → battle → upgrade) berjalan terus; loop besar maju lewa
 - **Encounter acak** berbasis jarak tempuh, dengan indikator bahaya (hijau/kuning/merah) di pojok layar. Ada jeda aman 3 detik setelah battle.
 - **Interaksi**: bicara ke NPC, buka peti, periksa objek, dan pindah area lewat pintu atau tepi peta.
 - **Path action Lira: "Tanya"** — bisa dipakai ke NPC tertentu untuk membuka info rahasia, lokasi peti tersembunyi, atau diskon toko. Ini penghormatan kecil ke path action Octopath.
+- **Path action Seren: "Curi"** — selama Seren ikut, pemain bisa mencoba mencuri item dari NPC tertentu (peluang berdasarkan level). Gagal menurunkan reputasi di tambang, jadi NPC tersebut tidak bisa dicoba lagi.
 - **Save**: api unggun (save manual + pulihkan HP/SP) dan auto-save setiap pindah area.
 
 **Kontrol mobile (landscape)**
@@ -151,7 +153,7 @@ stateDiagram-v2
 
 ## Karakter, stats & progression
 
-Kael adalah damage dealer dan tank yang menjaga Lira; Lira adalah healer yang juga membuka weakness elemen dan mengalirkan BP ke Kael. Level cap chapter 1 adalah 15.
+Kael adalah damage dealer dan tank yang menjaga Lira; Lira adalah healer yang juga membuka weakness elemen dan mengalirkan BP ke Kael. Seren (tamu) adalah debuffer cepat yang membuka jalan untuk Break: ia melemahkan pertahanan musuh dan menghancurkan shield dengan serangan multi-hit. Level cap chapter 1 adalah 15.
 
 **Stats level 1**
 
@@ -159,6 +161,9 @@ Kael adalah damage dealer dan tank yang menjaga Lira; Lira adalah healer yang ju
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Kael | 220 | 40 | 34 | 28 | 18 | 18 | 24 | Pedang, Tombak | Api, Petir |
 | Lira | 170 | 70 | 22 | 20 | 32 | 30 | 28 | Tongkat, Belati | Es, Angin, Cahaya |
+| Seren (tamu) | 190 | 55 | 30 | 22 | 26 | 24 | 34 | Belati | Angin, Es |
+
+Seren bergabung dengan level yang sama dengan Kael saat itu (target 9–10).
 
 Pertumbuhan per level sekitar +7% HP dan +5% stat lain, dengan tabel pertumbuhan per karakter di data JSON.
 
@@ -182,6 +187,17 @@ Pertumbuhan per level sekitar +7% HP dan +5% stat lain, dengan tabel pertumbuhan
 | 7 | Light Ward | 10 | EDEF party +30% selama 3 giliran |
 | 11 | Radiant Bloom | 22 | Cahaya, semua musuh, power 1,4 |
 | 14 | Kindle | 16 | Beri 1 BP ke ally lain |
+
+**Skill Seren (tamu)**
+
+| Lv | Skill | SP | Efek |
+| --- | --- | --- | --- |
+| 1 | Shadow Stab | 6 | Belati, 1 musuh, 2 hit × 0,7 (penghancur shield) |
+| 1 | Rend Armor | 8 | DEF 1 musuh −30% selama 3 giliran |
+| 5 | Gale Cut | 11 | Angin, semua musuh, power 1,0 |
+| 8 | Hex Mark | 9 | EDEF 1 musuh −30% selama 3 giliran |
+| 10 | Rime Flurry | 14 | Es, 1 musuh, 3 hit × 0,6 |
+| 12 | Pilfer | 5 | Serang 1 musuh dan peluang mencuri item |
 
 **Progression**
 
@@ -308,6 +324,8 @@ Tampilan ala HD-2D dibangun dari lapisan dan cahaya, bukan dari sprite saja. Sem
 | --- | --- | --- |
 | Sprite overworld Kael & Lira | 2 sheet | Selesai |
 | Sprite battle Kael & Lira | 2 sheet (5 animasi) | Belum mulai |
+| Sprite overworld & battle Seren | 2 sheet | Belum mulai |
+| Portrait dialog Seren | 4 ekspresi | Belum mulai |
 | Portrait dialog | 2 karakter × 4 ekspresi | Belum mulai |
 | Sprite NPC overworld | 8 | Belum mulai |
 | Sprite battle musuh | 10 (termasuk mini-boss & boss) | Belum mulai |
@@ -350,12 +368,11 @@ Risiko terbesar adalah volume produksi art, bukan kode. Karena itu vertical slic
 **Keputusan (sebelumnya open questions, dijawab Sep 24, 2026)**
 
 - [x] Judul final game: **Legend Heroes**. *Ashen Crest* tetap dipakai sebagai nama bara suci dan judul Chapter 1.
-- [x] Karakter tamu ketiga: **ada**, ikut sementara di Old Emberline Mine. Chapter berikutnya akan punya sistem rekrut karakter, jadi party dan data karakter harus mendukung lebih dari 2 anggota.
+- [x] Karakter tamu ketiga: **ada**, yaitu **Seren** (pemburu relik, debuffer), ikut sementara di Old Emberline Mine. Chapter berikutnya akan punya sistem rekrut karakter, jadi party dan data karakter harus mendukung lebih dari 2 anggota.
 - [ ] Art final: masih terbuka. Musik: dibuat oleh Claude (lihat catatan audio).
 - [x] Model rilis: **gratis penuh**, tanpa iklan dan tanpa IAP.
 - [x] Resolusi virtual: **480×270**, tetap.
 
 **Masih terbuka**
 
-- [ ] Karakter tamu: nama, peran, senjata/elemen, dan kapan ia bergabung atau pergi.
 - [ ] Siapa yang membuat art final (sprite battle, tileset, portrait, UI).

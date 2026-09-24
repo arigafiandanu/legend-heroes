@@ -18,5 +18,16 @@
     "statGrowth": 0.05,
     "weapons": ["staff", "dagger"],
     "elements": ["ice", "wind", "light"]
+  },
+  {
+    "id": "seren",
+    "name": "Seren",
+    "guest": true,
+    "sheet": "seren_sheet.png",
+    "stats": { "hp": 190, "sp": 55, "atk": 30, "def": 22, "eatk": 26, "edef": 24, "spd": 34 },
+    "hpGrowth": 0.07,
+    "statGrowth": 0.05,
+    "weapons": ["dagger"],
+    "elements": ["wind", "ice"]
   }
 ]

@@ -15,5 +15,12 @@
   { "id": "gale_dance", "owner": "lira", "learnLevel": 4, "name": { "en": "Gale Dance", "id": "Gale Dance" },
     "sp": 12, "types": ["wind"], "target": "randomEnemies", "effect": "damage", "power": 1.0, "hits": 2 },
   { "id": "radiant_bloom", "owner": "lira", "learnLevel": 11, "name": { "en": "Radiant Bloom", "id": "Radiant Bloom" },
-    "sp": 22, "types": ["light"], "target": "allEnemies", "effect": "damage", "power": 1.4 }
+    "sp": 22, "types": ["light"], "target": "allEnemies", "effect": "damage", "power": 1.4 },
+
+  { "id": "shadow_stab", "owner": "seren", "learnLevel": 1, "name": { "en": "Shadow Stab", "id": "Shadow Stab" },
+    "sp": 6, "types": ["dagger"], "target": "singleEnemy", "effect": "damage", "power": 0.7, "hits": 2 },
+  { "id": "gale_cut", "owner": "seren", "learnLevel": 5, "name": { "en": "Gale Cut", "id": "Gale Cut" },
+    "sp": 11, "types": ["wind"], "target": "allEnemies", "effect": "damage", "power": 1.0 },
+  { "id": "rime_flurry", "owner": "seren", "learnLevel": 10, "name": { "en": "Rime Flurry", "id": "Rime Flurry" },
+    "sp": 14, "types": ["ice"], "target": "singleEnemy", "effect": "damage", "power": 0.6, "hits": 3 }
 ]
