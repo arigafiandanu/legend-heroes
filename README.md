@@ -1,6 +1,6 @@
-# Ashen Crest — Chapter 1
+# Legend Heroes — Chapter 1: Ashen Crest
 
-JRPG pixel art bergaya HD-2D untuk Android & iOS (Flutter + Flame). Spec lengkap: `Ashen Crest Chapter 1 — Game Spec & Plan.md`.
+JRPG pixel art bergaya HD-2D untuk Android & iOS (Flutter + Flame). Spec lengkap: `Legend Heroes Chapter 1 — Game Spec & Plan.md`.
 
 ## Jalankan
 

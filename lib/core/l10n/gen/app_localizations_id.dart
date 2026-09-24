@@ -9,7 +9,7 @@ class AppLocalizationsId extends AppLocalizations {
   AppLocalizationsId([String locale = 'id']) : super(locale);
 
   @override
-  String get appTitle => 'Ashen Crest';
+  String get appTitle => 'Legend Heroes';
 
   @override
   String get actionButton => 'Aksi';

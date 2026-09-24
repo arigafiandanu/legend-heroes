@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Ashen Crest';
+  String get appTitle => 'Legend Heroes';
 
   @override
   String get actionButton => 'Action';

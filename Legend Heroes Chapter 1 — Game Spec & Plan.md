@@ -1,18 +1,18 @@
-# Ashen Crest: Chapter 1 — Game Spec & Plan
+# Legend Heroes — Chapter 1: Ashen Crest — Game Spec & Plan
 
 Sep 24, 2026 · @fian
 
 ## Ringkasan
 
-Ashen Crest (working title) adalah JRPG pixel art bergaya HD-2D untuk Android & iOS. Chapter 1 berdurasi 1–2 jam dengan battle turn-based ala Octopath (Break & Boost). Engine: Flutter + Flame, peta dibuat di Tiled, dan game berjalan full offline.
+Legend Heroes adalah JRPG pixel art bergaya HD-2D untuk Android & iOS. Chapter 1 berjudul *Ashen Crest*. Chapter 1 berdurasi 1–2 jam dengan battle turn-based ala Octopath (Break & Boost). Engine: Flutter + Flame, peta dibuat di Tiled, dan game berjalan full offline.
 
 | Keputusan | Pilihan |
 | --- | --- |
 | Scope | Chapter 1, target 75–110 menit main |
-| Party | 2 karakter: Kael (hero) dan Lira (support) |
+| Party | Kael (hero) dan Lira (support), plus 1 karakter tamu sementara di tambang; sistem rekrut karakter menyusul di chapter berikutnya |
 | Battle | Turn-based, shield + weakness, Break, Boost Point (BP) |
 | Platform | Android 8+ dan iOS 15+, orientasi landscape |
-| Monetisasi | Belum ada untuk chapter 1 (rilis gratis / demo) |
+| Monetisasi | Gratis penuh: tanpa iklan dan tanpa IAP |
 | Bahasa | Indonesia dan Inggris sejak awal (string terpisah) |
 
 **Pilar desain**
@@ -317,7 +317,7 @@ Tampilan ala HD-2D dibangun dari lapisan dan cahaya, bukan dari sprite saja. Sem
 | BGM (desa, hutan, tambang, battle, boss, tema) | 6 track | Belum mulai |
 | SFX | ±30 | Belum mulai |
 
-Untuk audio, sumber berlisensi CC0 atau royalty-free bisa dipakai dulu sebagai placeholder sebelum musik final.
+Musik (6 track BGM) dibuat oleh Claude. SFX boleh memakai sumber CC0 atau royalty-free.
 
 ## Plan & milestone
 
@@ -347,10 +347,15 @@ Risiko terbesar adalah volume produksi art, bukan kode. Karena itu vertical slic
 | Scope creep (fitur ekstra, chapter 2) | Chapter 1 tidak pernah rilis | Cut list di bagian Plan; fitur baru masuk backlog chapter 2 |
 | Review App Store / signing iOS | Rilis iOS tertunda | Upload TestFlight sejak M3, bukan di akhir |
 
-**Open questions**
+**Keputusan (sebelumnya open questions, dijawab Sep 24, 2026)**
 
-- [ ] Judul final game (Ashen Crest masih working title)?
-- [ ] Party tetap 2 orang, atau ada karakter tamu ketiga yang ikut sementara di tambang?
-- [ ] Siapa yang membuat art final dan musik: dikerjakan sendiri, freelancer, atau asset berlisensi?
-- [ ] Chapter 1 dirilis gratis penuh, atau jadi demo dari game berbayar / IAP untuk chapter berikutnya?
-- [ ] Resolusi virtual 480×270 sudah pas, atau mau lebih rapat (mis. 400×225) supaya sprite terlihat lebih besar di HP?
+- [x] Judul final game: **Legend Heroes**. *Ashen Crest* tetap dipakai sebagai nama bara suci dan judul Chapter 1.
+- [x] Karakter tamu ketiga: **ada**, ikut sementara di Old Emberline Mine. Chapter berikutnya akan punya sistem rekrut karakter, jadi party dan data karakter harus mendukung lebih dari 2 anggota.
+- [ ] Art final: masih terbuka. Musik: dibuat oleh Claude (lihat catatan audio).
+- [x] Model rilis: **gratis penuh**, tanpa iklan dan tanpa IAP.
+- [x] Resolusi virtual: **480×270**, tetap.
+
+**Masih terbuka**
+
+- [ ] Karakter tamu: nama, peran, senjata/elemen, dan kapan ia bergabung atau pergi.
+- [ ] Siapa yang membuat art final (sprite battle, tileset, portrait, UI).
