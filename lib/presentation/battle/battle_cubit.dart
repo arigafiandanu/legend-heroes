@@ -45,6 +45,8 @@ class BattleCubit extends Cubit<BattleViewState> {
         _hp[targetId] = hpAfter;
       case Healed(:final targetId, :final hpAfter):
         _hp[targetId] = hpAfter;
+      case Revived(:final unitId, :final hp):
+        _hp[unitId] = hp;
       case SpChanged(:final unitId, :final sp):
         _sp[unitId] = sp;
       case BpChanged(:final unitId, :final bp):

@@ -1,0 +1,14 @@
+{
+  "whisperwood": {
+    "minDistance": 380,
+    "maxDistance": 760,
+    "groups": [
+      { "weight": 3, "enemies": ["ashen_rat", "ashen_rat"] },
+      { "weight": 3, "enemies": ["wisp_moth", "ashen_rat"] },
+      { "weight": 2, "enemies": ["blight_sprout"] },
+      { "weight": 2, "enemies": ["wisp_moth", "wisp_moth"] },
+      { "weight": 1, "enemies": ["moss_wolf"] },
+      { "weight": 1, "enemies": ["ashen_rat", "blight_sprout", "wisp_moth"] }
+    ]
+  }
+}

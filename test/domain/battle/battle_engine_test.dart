@@ -3,6 +3,8 @@ import 'package:ashen_crest/domain/battle/battle_action.dart';
 import 'package:ashen_crest/domain/battle/battle_engine.dart';
 import 'package:ashen_crest/domain/battle/battle_event.dart';
 import 'package:ashen_crest/domain/battle/battle_unit.dart';
+import 'package:ashen_crest/domain/inventory.dart';
+import 'package:ashen_crest/domain/item.dart';
 import 'package:ashen_crest/domain/skill.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -70,12 +72,22 @@ const heal = Skill(
 BattleUnit kael({List<Skill> skills = const [emberSlash, crossThrust, thunderEdge]}) =>
     hero('kael', s: stats(atk: 34, def: 28, eatk: 18, edef: 18, spd: 30), skills: skills);
 
+const herbal = ItemDef(id: 'herbal', names: {'en': 'Herbal'}, kind: ItemKind.consumable, effect: ItemEffect.healHp, amount: 100);
+const feather = ItemDef(id: 'bulu_bara', names: {'en': 'Ember Feather'}, kind: ItemKind.consumable, effect: ItemEffect.revive, amount: 50);
+
 BattleEngine engineWith({
   List<BattleUnit>? party,
   required List<BattleUnit> enemies,
   FixedRandom? random,
+  Inventory? inventory,
 }) =>
-    BattleEngine(party: party ?? [kael()], enemies: enemies, random: random ?? FixedRandom());
+    BattleEngine(
+      party: party ?? [kael()],
+      enemies: enemies,
+      random: random ?? FixedRandom(),
+      inventory: inventory,
+      items: const {'herbal': herbal, 'bulu_bara': feather},
+    );
 
 List<T> ofType<T>(List<BattleEvent> events) => events.whereType<T>().toList();
 
@@ -247,6 +259,66 @@ void main() {
       final events = e.submitAction(const SkillAction(skill: heal, targetId: 'kael'));
       expect(ally.hp, 220);
       expect(ofType<Healed>(events).single.amount, 20);
+    });
+  });
+
+  group('items', () {
+    test('heal an ally, use up one item and report it', () {
+      final inv = Inventory()..add('herbal', 2);
+      final ally = hero('lira', s: stats(hp: 200, spd: 20));
+      final e = engineWith(party: [kael(), ally], enemies: [foe('rat', s: stats(spd: 10))], inventory: inv)
+        ..start();
+      ally.hp = 50;
+      final events = e.submitAction(const ItemAction(itemId: 'herbal', targetId: 'lira'));
+      expect(ally.hp, 150);
+      expect(inv.count('herbal'), 1);
+      expect(ofType<ItemUsed>(events).single.itemId, 'herbal');
+      expect(ofType<Healed>(events).single.amount, 100);
+    });
+
+    test('Ember Feather revives a knocked-out ally who acts again next round', () {
+      final inv = Inventory()..add('bulu_bara');
+      final ally = hero('lira', s: stats(hp: 200, spd: 20));
+      final e = engineWith(
+        party: [kael(), ally],
+        enemies: [foe('rat', s: stats(hp: 9999, spd: 10))],
+        inventory: inv,
+      )..start();
+      ally.hp = 0;
+      final events = e.submitAction(const ItemAction(itemId: 'bulu_bara', targetId: 'lira'));
+      expect(ofType<Revived>(events).single.hp, 100);
+      expect(e.nextRoundOrder.map((u) => u.id), contains('lira'));
+    });
+
+    test('rejects items the party does not have or that would do nothing', () {
+      final inv = Inventory()..add('herbal');
+      final e = engineWith(enemies: [foe('rat', s: stats(spd: 10))], inventory: inv)..start();
+      expect(() => e.submitAction(const ItemAction(itemId: 'bulu_bara', targetId: 'kael')), throwsArgumentError);
+      expect(() => e.submitAction(const ItemAction(itemId: 'herbal', targetId: 'kael')), throwsArgumentError); // full HP
+    });
+
+    test('usableItems lists battle consumables the party holds', () {
+      final inv = Inventory()..add('herbal', 2)..add('quest_thing');
+      final e = engineWith(enemies: [foe('rat', s: stats(spd: 10))], inventory: inv)..start();
+      expect(e.usableItems.map((i) => i.id), ['herbal']);
+    });
+  });
+
+  group('bestiary', () {
+    test('weaknesses already known are shown and not re-announced', () {
+      final rat = BattleUnit.enemy(
+        id: 'rat',
+        name: 'rat',
+        stats: stats(hp: 9999, spd: 10),
+        shield: 3,
+        weaknesses: const {AttackType.sword},
+        revealed: const {AttackType.sword},
+      );
+      expect(rat.revealed, {AttackType.sword});
+      final e = engineWith(enemies: [rat])..start();
+      final events = e.submitAction(const AttackAction(targetId: 'rat'));
+      expect(ofType<WeaknessRevealed>(events), isEmpty);
+      expect(ofType<ShieldReduced>(events), hasLength(1));
     });
   });
 

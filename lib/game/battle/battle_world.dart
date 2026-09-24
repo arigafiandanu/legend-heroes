@@ -143,6 +143,17 @@ class BattleWorld extends World with HasGameReference<AshenCrestGame> {
           add(PopupText(l10n.weakText, position: top - Vector2(0, 11), color: const Color(0xFFFFD34E), fontSize: 7));
         }
         await _wait(300);
+      case ItemUsed():
+        cubit.onEventPlayed(e);
+        await _wait(150);
+      case Revived(:final unitId, :final hp):
+        cubit.onEventPlayed(e);
+        final view = _party[unitId];
+        if (view != null) {
+          view.add(OpacityEffect.to(1, EffectController(duration: 0.3)));
+          add(PopupText('+$hp', position: view.position - Vector2(0, view.size.y + 8), color: const Color(0xFF7CE38B)));
+        }
+        await _wait(450);
       case Healed(:final targetId, :final amount):
         cubit.onEventPlayed(e);
         final view = _view(targetId)!;
@@ -199,6 +210,7 @@ class BattleWorld extends World with HasGameReference<AshenCrestGame> {
         SkillAction(:final skill) => skill.name(l10n.localeName),
         DefendAction() => l10n.cmdDefend,
         FleeAction() => l10n.cmdFlee,
+        ItemAction(:final itemId) => data.items[itemId]?.name(l10n.localeName) ?? itemId,
       };
 
   void _stepBackAll() {

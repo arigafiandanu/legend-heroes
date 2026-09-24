@@ -29,3 +29,10 @@ class DefendAction extends BattleAction {
 class FleeAction extends BattleAction {
   const FleeAction();
 }
+
+/// Use a consumable from the party inventory on an ally (alive or KO).
+class ItemAction extends BattleAction {
+  const ItemAction({required this.itemId, required this.targetId});
+  final String itemId;
+  final String targetId;
+}

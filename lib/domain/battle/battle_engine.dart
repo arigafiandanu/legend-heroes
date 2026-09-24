@@ -2,6 +2,8 @@ import 'dart:math';
 
 import '../../core/constants.dart';
 import '../attack_type.dart';
+import '../inventory.dart';
+import '../item.dart';
 import '../skill.dart';
 import 'battle_action.dart';
 import 'battle_event.dart';
@@ -22,6 +24,8 @@ class BattleEngine {
     required List<BattleUnit> enemies,
     Random? random,
     this.ai = const EnemyAi(),
+    this.inventory,
+    this.items = const {},
   })  : party = List.unmodifiable(party),
         enemies = List.unmodifiable(enemies),
         _random = random ?? Random() {
@@ -35,6 +39,10 @@ class BattleEngine {
   final List<BattleUnit> party;
   final List<BattleUnit> enemies;
   final EnemyAi ai;
+
+  /// Party inventory shared with the overworld; null disables items.
+  final Inventory? inventory;
+  final Map<String, ItemDef> items;
   final Random _random;
   late final DamageCalculator _calc;
   late final TurnQueue _queue;
@@ -53,6 +61,12 @@ class BattleEngine {
   bool get canFlee => !enemies.any((e) => e.isBoss);
   int get maxBoost =>
       min(BattleRules.maxBoostPerAction, currentActor?.bp ?? 0);
+
+  /// Consumables the party holds that can be used in battle.
+  List<ItemDef> get usableItems => [
+        for (final id in inventory?.items.keys ?? const <String>[])
+          if (items[id] case final def? when def.isConsumable && def.effect != ItemEffect.none) def,
+      ];
 
   List<BattleUnit> get upcomingThisRound => _queue.remaining;
   List<BattleUnit> get nextRoundOrder => _queue.previewNextRound(units, round);
@@ -159,6 +173,15 @@ class BattleEngine {
         if (!canFlee) throw ArgumentError('Cannot flee from a boss');
       case DefendAction():
         break;
+      case ItemAction(:final itemId, :final targetId):
+        final def = items[itemId];
+        if (def == null || (inventory?.count(itemId) ?? 0) == 0) {
+          throw ArgumentError.value(itemId, 'itemId', 'not in the inventory');
+        }
+        final target = party.where((u) => u.id == targetId).firstOrNull;
+        if (target == null || !def.canUseOn(target)) {
+          throw ArgumentError.value(targetId, 'targetId', '$itemId has no effect');
+        }
     }
   }
 
@@ -188,6 +211,17 @@ class BattleEngine {
         actor.defending = true;
         actor.priorityNextRound = true;
         events.add(DefendStarted(actor.id));
+      case ItemAction(:final itemId, :final targetId):
+        final target = unit(targetId);
+        inventory!.remove(itemId);
+        events.add(ItemUsed(unitId: actor.id, itemId: itemId, targetId: targetId));
+        final result = items[itemId]!.use(target)!;
+        if (result.revived) {
+          events.add(Revived(target.id, target.hp));
+        } else if (result.hp > 0) {
+          events.add(Healed(sourceId: actor.id, targetId: target.id, amount: result.hp, hpAfter: target.hp));
+        }
+        if (result.sp > 0) events.add(SpChanged(target.id, target.sp));
       case FleeAction():
         if (_random.nextDouble() < BattleRules.fleeChance) {
           phase = BattlePhase.escaped;

@@ -1,0 +1,17 @@
+[
+  { "id": "herbal", "kind": "consumable", "effect": "healHp", "amount": 100, "price": 20,
+    "name": { "en": "Herbal", "id": "Herbal" },
+    "description": { "en": "Restores 100 HP.", "id": "Memulihkan 100 HP." } },
+  { "id": "tonik", "kind": "consumable", "effect": "healSp", "amount": 30, "price": 40,
+    "name": { "en": "Tonic", "id": "Tonik" },
+    "description": { "en": "Restores 30 SP.", "id": "Memulihkan 30 SP." } },
+  { "id": "bulu_bara", "kind": "consumable", "effect": "revive", "amount": 50, "price": 120,
+    "name": { "en": "Ember Feather", "id": "Bulu Bara" },
+    "description": { "en": "Revives a fallen ally with 50% HP.", "id": "Menghidupkan kembali ally dengan 50% HP." } },
+  { "id": "penawar", "kind": "consumable", "effect": "cure", "amount": 0, "price": 15,
+    "name": { "en": "Antidote", "id": "Penawar" },
+    "description": { "en": "Cures poison.", "id": "Menyembuhkan racun." } },
+  { "id": "herbal_bara", "kind": "key", "price": 0,
+    "name": { "en": "Ember Herb", "id": "Herbal Bara" },
+    "description": { "en": "A warm herb from Whisperwood. The merchant wants some.", "id": "Tanaman hangat dari Whisperwood. Si pedagang mencarinya." } }
+]

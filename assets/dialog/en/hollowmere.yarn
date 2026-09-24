@@ -1,0 +1,60 @@
+title: Elder
+---
+<<if has_flag("quest_started")>>
+    Elder: The Crest's shards flew east, toward Whisperwood.
+    Elder: Rest at the campfire before you set out. Be careful, child.
+<<else>>
+    Elder: Kael... last night the Ashen Crest cracked. You saw how bad it was.
+    Elder: That sacred ember protects this village. Without its shards, the Ashblight will keep spreading.
+    Kael: I'll find them. Where did the shards go?
+    Elder: East, through Whisperwood. Perhaps as far as the old Emberline mine.
+    Lira: Then I'm coming too. Don't argue, Kael. Who else is going to patch you up?
+    Kael: ...Fine. But stay close to me.
+    Elder: Take these. May the ember watch over you both.
+    <<flag quest_started>>
+    <<give herbal 3>>
+<<endif>>
+===
+title: Merchant
+---
+Merchant: Welcome! My shop hasn't reopened since the Crest cracked.
+Merchant: If you're heading into the woods, find me some Ember Herbs. I'll pay you well.
+===
+title: Child
+---
+Child: Kael! The fire's gone dim, hasn't it? I'm scared of the monsters in the woods...
+Lira: Don't worry. We'll make it burn bright again.
+===
+title: Guard
+---
+<<if has_flag("quest_started")>>
+    Guard: So the Elder sent you. The beasts in Whisperwood are getting worse. Look after Lira.
+<<else>>
+    Guard: The east gate has been shut since last night. Speak with the Elder by the shrine first.
+<<endif>>
+===
+title: Guard_Blocked
+---
+Guard: Hold on, Kael. The Elder wants a word before you go anywhere.
+===
+title: Sign_Whisperwood
+---
+Sign: → Whisperwood. Beware of wild beasts.
+===
+title: Shrine
+---
+The Ashen Crest's ember flickers weakly. A long crack splits its surface.
+Lira: Strange... my chest feels warm whenever I stand near it.
+===
+title: Campfire
+---
+The campfire burns warm.
+-> Rest and save
+    <<rest>>
+    The party is fully restored.
+    <<save_menu>>
+-> Just rest
+    <<rest>>
+    The party is fully restored.
+-> Leave
+===

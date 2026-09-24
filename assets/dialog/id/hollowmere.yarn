@@ -1,0 +1,60 @@
+title: Elder
+---
+<<if has_flag("quest_started")>>
+    Tetua: Pecahan Crest terbang ke timur, ke arah Whisperwood.
+    Tetua: Istirahatlah di api unggun sebelum berangkat. Hati-hati, Nak.
+<<else>>
+    Tetua: Kael... semalam Ashen Crest retak. Kau lihat sendiri betapa buruknya.
+    Tetua: Bara suci itu yang menjaga desa ini. Tanpa pecahannya, Ashblight akan terus menyebar.
+    Kael: Aku akan mencarinya. Ke mana pecahannya pergi?
+    Tetua: Ke timur, menembus Whisperwood. Mungkin sampai tambang tua Emberline.
+    Lira: Kalau begitu aku ikut. Jangan membantah, Kael. Siapa lagi yang mau mengobatimu?
+    Kael: ...Baiklah. Tapi jangan jauh-jauh dariku.
+    Tetua: Bawa ini. Semoga bara melindungi kalian berdua.
+    <<flag quest_started>>
+    <<give herbal 3>>
+<<endif>>
+===
+title: Merchant
+---
+Pedagang: Selamat datang! Tokoku belum buka lagi sejak Crest retak.
+Pedagang: Kalau ke hutan, carilah Herbal Bara untukku. Aku akan membayarmu dengan pantas.
+===
+title: Child
+---
+Anak: Kak Kael! Apinya jadi redup ya? Aku takut monster dari hutan...
+Lira: Tenang saja. Kami akan membuat apinya menyala lagi.
+===
+title: Guard
+---
+<<if has_flag("quest_started")>>
+    Penjaga: Jadi Tetua mengutusmu. Monster di Whisperwood makin ganas. Jaga Lira baik-baik.
+<<else>>
+    Penjaga: Gerbang timur ditutup sejak semalam. Bicaralah dulu dengan Tetua di depan kuil.
+<<endif>>
+===
+title: Guard_Blocked
+---
+Penjaga: Tunggu dulu, Kael. Tetua ingin bicara denganmu sebelum kau pergi ke mana pun.
+===
+title: Sign_Whisperwood
+---
+Papan: → Whisperwood. Waspada terhadap binatang liar.
+===
+title: Shrine
+---
+Bara Ashen Crest berkedip lemah. Retakan panjang membelah permukaannya.
+Lira: Anehnya... dadaku terasa hangat setiap berdiri di dekat sini.
+===
+title: Campfire
+---
+Api unggun menyala hangat.
+-> Istirahat dan simpan
+    <<rest>>
+    Party pulih sepenuhnya.
+    <<save_menu>>
+-> Istirahat saja
+    <<rest>>
+    Party pulih sepenuhnya.
+-> Pergi
+===

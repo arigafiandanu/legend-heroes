@@ -67,6 +67,19 @@ class Healed extends BattleEvent {
   final int hpAfter;
 }
 
+class ItemUsed extends BattleEvent {
+  const ItemUsed({required this.unitId, required this.itemId, required this.targetId});
+  final String unitId;
+  final String itemId;
+  final String targetId;
+}
+
+class Revived extends BattleEvent {
+  const Revived(this.unitId, this.hp);
+  final String unitId;
+  final int hp;
+}
+
 class WeaknessRevealed extends BattleEvent {
   const WeaknessRevealed(this.unitId, this.type);
   final String unitId;

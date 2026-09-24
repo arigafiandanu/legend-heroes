@@ -1,11 +1,12 @@
 import '../attack_type.dart';
+import '../item.dart';
 import '../skill.dart';
 import '../stats.dart';
 
 enum Side { party, enemy }
 
 /// Mutable per-battle state of one combatant.
-class BattleUnit {
+class BattleUnit implements Vitals {
   BattleUnit.party({
     required this.id,
     required this.name,
@@ -23,7 +24,8 @@ class BattleUnit {
         keping = 0,
         hp = hp ?? stats.hp,
         sp = sp ?? stats.sp,
-        shield = 0;
+        shield = 0,
+        revealed = {};
 
   BattleUnit.enemy({
     required this.id,
@@ -35,7 +37,9 @@ class BattleUnit {
     this.isBoss = false,
     this.exp = 0,
     this.keping = 0,
+    Set<AttackType> revealed = const {},
   })  : side = Side.enemy,
+        revealed = {...revealed},
         weapons = [attackType],
         skills = const [],
         maxShield = shield,
@@ -56,13 +60,15 @@ class BattleUnit {
   final int exp;
   final int keping;
 
+  @override
   int hp;
+  @override
   int sp;
   int shield;
   int bp = 0;
 
-  /// Weaknesses the player has uncovered.
-  final Set<AttackType> revealed = {};
+  /// Weaknesses the player has uncovered (pre-filled from the bestiary).
+  final Set<AttackType> revealed;
 
   /// Boost was used on this unit's latest turn (no BP gain next turn).
   bool boostedLastTurn = false;
@@ -75,6 +81,11 @@ class BattleUnit {
 
   /// Round at whose start this unit recovers from Break; null = not broken.
   int? breakRecoverRound;
+
+  @override
+  int get maxHp => stats.hp;
+  @override
+  int get maxSp => stats.sp;
 
   bool get isParty => side == Side.party;
   bool get isAlive => hp > 0;
