@@ -125,6 +125,14 @@ Adegan battle dicek dengan `tools/art/battle_mock.py`; party di mock ini masih m
 
 ![Animasi musuh: idle, serang, hit, KO](art/whisperwood_enemies_anim.gif)
 
+Sprite battle party dibuat dengan `tools/art/party.py`. Badan Kael dan Lira diambil dari baris menghadap-kiri sheet overworld mereka, lalu warnanya dikunci ke LH-48 (warna hampir hitam menjadi warna outline). Senjata digambar per pose di layer terpisah dan diberi outline sendiri, begitu juga lengan yang menjulur keluar badan. Tebasan dan cahaya cast ditambahkan di atasnya.
+
+Sheet party berisi baris idle, attack, cast, hit, dan KO. Frame terakhir KO memperlihatkan karakter terbaring. Offset di JSON memakai koordinat layar (x negatif berarti maju ke arah musuh), dan `shadowX` menaruh bayangan tepat di bawah kaki.
+
+Peti (`assets/images/props/chest.png`, tertutup dan terbuka) dibuat dengan `tools/art/objects.py`. Backdrop battle (`assets/images/backdrops/whisperwood.png`) dibuat dengan `tools/art/backdrop.py` dari tile dan prop Whisperwood. Kedalamannya didapat dengan menurunkan tiap warna satu tingkat di ramp-nya, bukan dengan tint, jadi gambar tetap terkunci ke palet. Backdrop ini bisa diulang ke samping.
+
+![Sprite battle Kael dan Lira](art/party_battle_x3.png)
+
 ![Mock battle Whisperwood](art/whisperwood_battle_mock.png)
 
 ## 12. Boleh dan jangan

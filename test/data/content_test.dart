@@ -96,6 +96,25 @@ void main() {
     expect(gameData.enemies.values.where((e) => e.sprite != null).length, 4, reason: 'the Whisperwood four');
   });
 
+  test('party battle sheets exist for Kael and Lira', () {
+    for (final id in ['kael', 'lira']) {
+      final sprite = gameData.characters[id]!.battleSprite;
+      expect(sprite, isNotNull, reason: id);
+      for (final ext in ['png', 'json']) {
+        expect(File('assets/images/$sprite.$ext').existsSync(), isTrue, reason: '$id.$ext');
+      }
+    }
+  });
+
+  test('map backdrops and the chest sprite exist', () {
+    expect(File('assets/images/props/chest.png').existsSync(), isTrue);
+    for (final id in GameData.mapIds) {
+      final bg = map(id).properties.getValue<String>('backdrop');
+      if (bg != null) expect(File('assets/images/backdrops/$bg.png').existsSync(), isTrue, reason: '$id → $bg');
+    }
+    expect(map('whisperwood_1').properties.getValue<String>('backdrop'), 'whisperwood');
+  });
+
   test('map tilesets point at existing images', () {
     for (final id in GameData.mapIds) {
       for (final ts in map(id).tilesets) {

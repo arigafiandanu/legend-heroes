@@ -33,6 +33,8 @@ flutter:
     - assets/images/
     - assets/images/props/
     - assets/images/enemies/
+    - assets/images/party/
+    - assets/images/backdrops/
     - assets/data/
     - assets/maps/
     - assets/dialog/en/

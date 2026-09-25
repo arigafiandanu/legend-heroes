@@ -50,4 +50,28 @@ void main() {
     p.play('nope'); // unknown clips are ignored
     expect(p.name, 'attack');
   });
+
+  group('party sheet', () {
+    final kael = BattleSheetMeta.parse(File('assets/images/party/kael_battle.json').readAsStringSync());
+
+    test('has attack and cast that land, and a KO that holds', () {
+      expect(kael.anims.keys, containsAll(['idle', 'attack', 'cast', 'hit', 'ko']));
+      expect(kael.anims['attack']!.contact, isNotNull);
+      expect(kael.anims['cast']!.contact, isNotNull);
+      final p = AnimPlayback(kael)
+        ..play('ko')
+        ..update(9999);
+      expect(p.name, 'ko');
+    });
+
+    test('lunges left, toward the enemies', () {
+      final attack = kael.anims['attack']!;
+      expect(attack.offsets[attack.contact!].dx, lessThan(0));
+    });
+
+    test('shadow sits under the body, not the frame centre', () {
+      expect(kael.shadowX, greaterThan(kael.size / 2));
+      expect(meta.shadowX, meta.size / 2); // enemies default to the centre
+    });
+  });
 }

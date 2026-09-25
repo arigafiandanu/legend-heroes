@@ -16,19 +16,24 @@ import '../ashen_crest_game.dart';
 import '../character_sprite.dart';
 import 'battle_sheet.dart';
 import 'enemy_view.dart';
+import 'party_view.dart';
 import 'popup_text.dart';
 
 /// Battle scene. Plays back engine events as animations.
 /// Layout is in the 480×270 virtual space; wider screens see more backdrop.
 class BattleWorld extends World with HasGameReference<AshenCrestGame> {
-  BattleWorld({required this.cubit, required this.data, required this.l10n});
+  BattleWorld({required this.cubit, required this.data, required this.l10n, this.backdrop});
 
   final BattleCubit cubit;
   final GameData data;
   final AppLocalizations l10n;
 
+  /// Area backdrop (`assets/images/backdrops/<name>.png`), or null for the
+  /// procedural placeholder.
+  final String? backdrop;
+
   final Map<String, EnemyView> _enemies = {};
-  final Map<String, CharacterSprite> _party = {};
+  final Map<String, PositionComponent> _party = {};
   final Map<String, Vector2> _home = {};
   StreamSubscription<List<BattleEvent>>? _sub;
   bool _started = false;
@@ -46,24 +51,26 @@ class BattleWorld extends World with HasGameReference<AshenCrestGame> {
 
   @override
   Future<void> onLoad() async {
-    add(_Backdrop());
+    final bg = backdrop;
+    add(bg == null ? _Backdrop() : _ImageBackdrop(await game.images.load('backdrops/$bg.png')));
     final enemies = cubit.engine.enemies;
     final slots = _enemySlots[enemies.length.clamp(1, 4) - 1];
     final sheets = <String, BattleSheet>{};
+    Future<BattleSheet?> sheet(String? sprite) async {
+      if (sprite == null) return null;
+      return sheets[sprite] ??= BattleSheet(
+        await game.images.load('$sprite.png'),
+        BattleSheetMeta.parse(await (game.bundle ?? rootBundle).loadString('assets/images/$sprite.json')),
+      );
+    }
+
     for (var i = 0; i < enemies.length; i++) {
       final u = enemies[i];
       final def = data.enemies[u.id.split('#').first]!;
-      final sprite = def.sprite;
-      if (sprite != null && !sheets.containsKey(sprite)) {
-        sheets[sprite] = BattleSheet(
-          await game.images.load('$sprite.png'),
-          BattleSheetMeta.parse(await (game.bundle ?? rootBundle).loadString('assets/images/$sprite.json')),
-        );
-      }
       final c = _enemies[u.id] = EnemyView(
         unit: u,
         color: Color(def.color),
-        sheet: sprite == null ? null : sheets[sprite],
+        sheet: await sheet(def.sprite),
         position: slots[i % slots.length].toVector2(),
       )..priority = slots[i % slots.length].dy.toInt();
       _home[u.id] = c.position.clone();
@@ -71,11 +78,13 @@ class BattleWorld extends World with HasGameReference<AshenCrestGame> {
     final party = cubit.engine.party;
     for (var i = 0; i < party.length; i++) {
       final u = party[i];
-      final c = _party[u.id] = CharacterSprite(
-        sheetPath: data.characters[u.id]!.sheet,
-        facing: Facing.left,
-        position: _partySlots[i].toVector2(),
-      )..priority = _partySlots[i].dy.toInt();
+      final def = data.characters[u.id]!;
+      final battleSheet = await sheet(def.battleSprite);
+      final pos = _partySlots[i].toVector2();
+      final c = _party[u.id] = (battleSheet != null
+          ? PartyView(sheet: battleSheet, position: pos)
+          : CharacterSprite(sheetPath: def.sheet, facing: Facing.left, position: pos))
+        ..priority = _partySlots[i].dy.toInt();
       _home[u.id] = c.position.clone();
     }
     await addAll([..._enemies.values, ..._party.values]);
@@ -136,9 +145,19 @@ class BattleWorld extends World with HasGameReference<AshenCrestGame> {
           ..onEventPlayed(e)
           ..announce('${cubit.engine.unit(unitId).name} · ${_actionLabel(action)}');
         final enemy = _enemies[unitId];
+        final member = _party[unitId];
+        final clip = switch (action) {
+          AttackAction() => 'attack',
+          SkillAction(:final skill) => skill.isPhysical ? 'attack' : 'cast',
+          ItemAction() => 'cast',
+          _ => null,
+        };
         if (enemy != null && (action is AttackAction || action is SkillAction)) {
           await _wait(300); // time to read the announcement
           await enemy.attack(); // damage shows as the blow lands
+        } else if (member is PartyView && clip != null) {
+          await _wait(300);
+          await member.act(clip);
         } else {
           await _wait(450);
         }
@@ -150,6 +169,8 @@ class BattleWorld extends World with HasGameReference<AshenCrestGame> {
           enemy
             ..hpRatio = hpAfter / enemy.unit.stats.hp
             ..hit();
+        } else if (view is PartyView) {
+          view.hit();
         } else {
           _shakeParty(view);
         }
@@ -167,6 +188,7 @@ class BattleWorld extends World with HasGameReference<AshenCrestGame> {
         cubit.onEventPlayed(e);
         final view = _party[unitId];
         if (view != null) {
+          if (view is PartyView) view.revive();
           view.add(OpacityEffect.to(1, EffectController(duration: 0.3)));
           add(PopupText('+$hp', position: view.position - Vector2(0, view.size.y + 8), color: const Color(0xFF7CE38B)));
         }
@@ -202,10 +224,13 @@ class BattleWorld extends World with HasGameReference<AshenCrestGame> {
       case UnitDefeated(:final unitId):
         cubit.onEventPlayed(e);
         final enemy = _enemies[unitId];
+        final member = _party[unitId];
         if (enemy != null) {
           enemy.defeat();
+        } else if (member is PartyView) {
+          member.knockOut();
         } else {
-          _party[unitId]?.add(OpacityEffect.to(0.35, EffectController(duration: 0.3)));
+          member?.add(OpacityEffect.to(0.35, EffectController(duration: 0.3)));
         }
         await _wait(420);
       case EscapeFailed():
@@ -263,6 +288,28 @@ class _Backdrop extends Component {
     for (var x = -600.0; x < 1080; x += 26) {
       final h = 40 + (x * 7 % 23);
       canvas.drawRect(Rect.fromLTWH(x, 95 - h, 22, h), _trees);
+    }
+  }
+}
+
+/// Area backdrop image repeated sideways; above and below it (tall screens)
+/// continue with its top and bottom colours.
+class _ImageBackdrop extends Component {
+  _ImageBackdrop(this.image) : super(priority: -100000);
+
+  final Image image;
+  static final _paint = Paint()..filterQuality = FilterQuality.none;
+  static final _top = Paint()..color = const Color(0xFF1E1828);
+  static final _bottom = Paint()..color = const Color(0xFF306242);
+
+  @override
+  void render(Canvas canvas) {
+    final w = image.width.toDouble(), h = image.height.toDouble();
+    canvas
+      ..drawRect(Rect.fromLTRB(-1200, -400, 1680, 0), _top)
+      ..drawRect(Rect.fromLTRB(-1200, h, 1680, h + 400), _bottom);
+    for (var x = -w * 2; x < 1680; x += w) {
+      canvas.drawImage(image, Offset(x, 0), _paint);
     }
   }
 }

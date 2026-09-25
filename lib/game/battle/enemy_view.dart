@@ -39,8 +39,6 @@ class EnemyView extends PositionComponent with HasPaint {
     style: const TextStyle(fontSize: 7, color: Color(0xFFFFFFFF), fontWeight: FontWeight.bold),
   );
 
-  static final _shadow = Paint()..color = const Color(0x59000000);
-  static const _white = ColorFilter.mode(Color(0xFFFFFFFF), BlendMode.srcATop);
   static const _grey = ColorFilter.mode(Color(0xFFA8A2B8), BlendMode.modulate);
 
   @override
@@ -61,19 +59,8 @@ class EnemyView extends PositionComponent with HasPaint {
     _renderHud(canvas);
   }
 
-  void _renderSprite(Canvas canvas, AnimPlayback anim) {
-    final s = size.x;
-    final off = anim.offset;
-    // The shadow stays on the ground while a flyer falls.
-    canvas.drawOval(Rect.fromLTWH(off.dx + s * 0.2, s - 5, s * 0.6, 6),
-        Paint()..color = _shadow.color.withValues(alpha: _shadow.color.a * paint.color.a));
-    final src = Rect.fromLTWH(anim.frame * s, anim.clip.row * s, s, s);
-    final p = Paint()
-      ..filterQuality = FilterQuality.none
-      ..color = Color.fromRGBO(255, 255, 255, paint.color.a)
-      ..colorFilter = _flash > 0 ? _white : (broken ? _grey : null);
-    canvas.drawImageRect(sheet!.image, src, Rect.fromLTWH(off.dx, off.dy, s, s), p);
-  }
+  void _renderSprite(Canvas canvas, AnimPlayback anim) => sheet!.drawFrame(canvas, anim,
+      opacity: paint.color.a, filter: _flash > 0 ? BattleSheet.flash : (broken ? _grey : null));
 
   void _renderPlaceholder(Canvas canvas) {
     final alpha = paint.color.a;
@@ -175,12 +162,4 @@ class EnemyView extends PositionComponent with HasPaint {
     final delay = anim == null ? 0.0 : anim.clip.totalMs / 1000;
     add(OpacityEffect.fadeOut(EffectController(duration: 0.4, startDelay: delay)));
   }
-}
-
-/// An enemy's loaded battle sheet image + metadata.
-class BattleSheet {
-  BattleSheet(this.image, this.meta);
-
-  final Image image;
-  final BattleSheetMeta meta;
 }

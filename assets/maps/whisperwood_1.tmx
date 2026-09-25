@@ -5,6 +5,7 @@
   <property name="encounters" value="whisperwood"/>
   <property name="nameKey" value="mapWhisperwood"/>
   <property name="props" value="whisperwood"/>
+  <property name="backdrop" value="whisperwood"/>
  </properties>
  <tileset firstgid="1" name="whisperwood" tilewidth="16" tileheight="16" tilecount="37" columns="8">
   <image source="whisperwood_tiles.png" width="128" height="80"/>

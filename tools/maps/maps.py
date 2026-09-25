@@ -247,7 +247,8 @@ def whisperwood_1():
     W, H = 48, 28
     ts, meta = area_tileset("whisperwood")
     m = MapBuilder("whisperwood_1", W, H, {"bgm": "whisperwood", "encounters": "whisperwood",
-                                           "nameKey": "mapWhisperwood", "props": "whisperwood"}, seed=9, tileset=ts)
+                                           "nameKey": "mapWhisperwood", "props": "whisperwood",
+                                           "backdrop": "whisperwood"}, seed=9, tileset=ts)
     path = clean(stroke([(-1, 14.5), (10.5, 14.5), (10.5, 9.5), (22.5, 9.5), (22.5, 17.5), (34.5, 17.5), (34.5, 12.5),
                          (49, 12.5)], 1.45, W, H), W, H)
     on_path = clamped(path, W, H)

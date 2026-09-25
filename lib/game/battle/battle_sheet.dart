@@ -52,12 +52,13 @@ class AnimClip {
 
 /// Square battle sheet: one row per animation, one column per frame.
 class BattleSheetMeta {
-  const BattleSheetMeta({required this.size, required this.anims});
+  const BattleSheetMeta({required this.size, required this.anims, double? shadowX}) : shadowX = shadowX ?? size / 2;
 
   factory BattleSheetMeta.parse(String json) {
     final m = jsonDecode(json) as Map<String, dynamic>;
     return BattleSheetMeta(
       size: (m['size'] as num).toDouble(),
+      shadowX: (m['shadowX'] as num?)?.toDouble(),
       anims: {
         for (final e in (m['anims'] as Map<String, dynamic>).entries)
           e.key: AnimClip.fromJson(e.value as Map<String, dynamic>),
@@ -67,6 +68,9 @@ class BattleSheetMeta {
 
   final double size;
   final Map<String, AnimClip> anims;
+
+  /// Centre of the ground shadow within the frame (the feet).
+  final double shadowX;
 }
 
 /// Which frame of which clip to show. One-shot clips fall back to `idle`
@@ -93,5 +97,33 @@ class AnimPlayback {
   void update(double dtMs) {
     _t += dtMs;
     if (!clip.loop && _t >= clip.totalMs && _name != 'ko') play('idle');
+  }
+}
+
+/// A loaded battle sheet (image + metadata) that draws its current frame.
+class BattleSheet {
+  BattleSheet(this.image, this.meta);
+
+  final Image image;
+  final BattleSheetMeta meta;
+
+  /// One-frame white hit flash (art bible §9).
+  static const flash = ColorFilter.mode(Color(0xFFFFFFFF), BlendMode.srcATop);
+  static final _shadow = Paint();
+
+  /// Draws [anim]'s frame into a size×size box at the local origin, moved by
+  /// the clip's offset. The ground shadow only follows it sideways, so a
+  /// falling flyer drops onto its shadow.
+  void drawFrame(Canvas canvas, AnimPlayback anim, {double opacity = 1, ColorFilter? filter}) {
+    final s = meta.size;
+    final off = anim.offset;
+    _shadow.color = Color.fromRGBO(0, 0, 0, 0.35 * opacity);
+    canvas.drawOval(Rect.fromCenter(center: Offset(off.dx + meta.shadowX, s - 2), width: s * 0.6, height: 6), _shadow);
+    final p = Paint()
+      ..filterQuality = FilterQuality.none
+      ..color = Color.fromRGBO(255, 255, 255, opacity)
+      ..colorFilter = filter;
+    canvas.drawImageRect(
+        image, Rect.fromLTWH(anim.frame * s, anim.clip.row * s, s, s), Rect.fromLTWH(off.dx, off.dy, s, s), p);
   }
 }

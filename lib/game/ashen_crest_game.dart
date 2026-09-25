@@ -313,7 +313,7 @@ class AshenCrestGame extends FlameGame with KeyboardEvents implements DialogHost
     final cubit = battle = BattleCubit(engine, onOutcome: _applyOutcome);
     overlays.removeAll([Overlays.controls, Overlays.hud]);
     router.pushRoute(
-      WorldRoute(() => BattleWorld(cubit: cubit, data: data, l10n: l10n), maintainState: false),
+      WorldRoute(() => BattleWorld(cubit: cubit, data: data, l10n: l10n, backdrop: map?.backdrop), maintainState: false),
       name: 'battle',
     );
     overlays.add(Overlays.battleHud);

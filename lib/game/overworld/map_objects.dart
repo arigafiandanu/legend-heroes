@@ -51,18 +51,16 @@ class Npc extends CharacterSprite implements Interactable {
   Future<void> interact() => onTalk(dialogNode);
 }
 
-/// Treasure chest (procedural placeholder art).
-class Chest extends PositionComponent implements Interactable {
+/// Treasure chest: `props/chest.png` (closed, open), 16×16 frames.
+class Chest extends PositionComponent with HasGameReference implements Interactable {
   Chest({required Rect rect, required this.opened, required this.onOpen})
       : super(position: Vector2(rect.left, rect.top), size: Vector2(rect.width, rect.height));
 
   bool opened;
   final Future<void> Function(Chest chest) onOpen;
 
-  static final _wood = Paint()..color = const Color(0xFF8A5A32);
-  static final _dark = Paint()..color = const Color(0xFF4A2E1A);
-  static final _gold = Paint()..color = const Color(0xFFE8C04A);
-  static final _inside = Paint()..color = const Color(0xFF221812);
+  static final _shadow = Paint()..color = const Color(0x55000000);
+  late final Sprite _closed, _open;
 
   Rect get solid => toRect().deflate(1);
 
@@ -70,26 +68,20 @@ class Chest extends PositionComponent implements Interactable {
   Rect get area => toRect().inflate(4);
 
   @override
-  Future<void> onLoad() async => priority = (position.y + size.y).toInt();
+  Future<void> onLoad() async {
+    priority = (position.y + size.y).toInt();
+    final image = await game.images.load('props/chest.png');
+    _closed = Sprite(image, srcSize: Vector2.all(16));
+    _open = Sprite(image, srcPosition: Vector2(16, 0), srcSize: Vector2.all(16));
+  }
 
   @override
   void render(Canvas canvas) {
-    final body = Rect.fromLTWH(1, 6, size.x - 2, size.y - 7);
-    canvas
-      ..drawOval(Rect.fromLTWH(1, size.y - 3, size.x - 2, 4), Paint()..color = const Color(0x55000000))
-      ..drawRect(body, _wood)
-      ..drawRect(body, _dark..style = PaintingStyle.stroke..strokeWidth = 1);
-    _dark.style = PaintingStyle.fill;
-    if (opened) {
-      canvas.drawRect(Rect.fromLTWH(2, 4, size.x - 4, 4), _inside);
-      canvas.drawRect(Rect.fromLTWH(1, 0, size.x - 2, 4), _wood);
-    } else {
-      canvas
-        ..drawRect(Rect.fromLTWH(1, 2, size.x - 2, 6), _wood)
-        ..drawRect(Rect.fromLTWH(1, 7, size.x - 2, 1), _dark)
-        ..drawRect(Rect.fromLTWH(size.x / 2 - 1.5, 6, 3, 4), _gold);
-    }
+    canvas.drawOval(Rect.fromLTWH(1, size.y - 3, size.x - 1, 4), _shadow);
+    (opened ? _open : _closed).render(canvas, position: Vector2(size.x / 2 - 8, size.y - 16), overridePaint: _pixel);
   }
+
+  static final _pixel = Paint()..filterQuality = FilterQuality.none;
 
   @override
   Future<void> interact() => onOpen(this);

@@ -11,6 +11,7 @@ class CharacterDef {
     required this.statGrowth,
     required this.weapons,
     required this.elements,
+    this.battleSprite,
   });
 
   factory CharacterDef.fromJson(Map<String, dynamic> json) => CharacterDef(
@@ -22,6 +23,7 @@ class CharacterDef {
         statGrowth: (json['statGrowth'] as num).toDouble(),
         weapons: _types(json['weapons']),
         elements: _types(json['elements']),
+        battleSprite: json['battleSprite'] as String?,
       );
 
   final String id;
@@ -34,6 +36,10 @@ class CharacterDef {
   final double statGrowth;
   final List<AttackType> weapons;
   final List<AttackType> elements;
+
+  /// Battle sheet under assets/images/ without extension, or null to use
+  /// the overworld sheet in battle.
+  final String? battleSprite;
 
   Stats statsAt(int level) =>
       base.atLevel(level, hpGrowth: hpGrowth, statGrowth: statGrowth);

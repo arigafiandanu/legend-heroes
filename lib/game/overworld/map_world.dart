@@ -32,6 +32,9 @@ class MapWorld extends World with HasGameReference<AshenCrestGame> {
   late final Vector2 mapSize;
   late final String bgm;
   late final String? nameKey;
+
+  /// Battle backdrop for fights started here.
+  late final String? backdrop;
   EncounterMeter? meter;
   EncounterTable? _table;
   final _random = Random();
@@ -70,6 +73,7 @@ class MapWorld extends World with HasGameReference<AshenCrestGame> {
     mapSize = Vector2(map.width * tileSize, map.height * tileSize);
     bgm = map.properties.getValue<String>('bgm') ?? 'hollowmere';
     nameKey = map.properties.getValue<String>('nameKey');
+    backdrop = map.properties.getValue<String>('backdrop');
     final table = map.properties.getValue<String>('encounters');
     if (table != null) {
       _table = game.data.encounters[table];
