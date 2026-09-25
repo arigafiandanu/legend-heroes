@@ -115,6 +115,18 @@ Dibuat dengan `tools/art/whisperwood.py` (tile + prop) dan dicek dalam adegan de
 
 ![Mock Whisperwood tanpa efek engine](art/whisperwood_mock_flat.png)
 
+Sprite battle 4 musuh Whisperwood (Ashen Rat, Wisp Moth, Blight Sprout, Moss Wolf) dibuat dengan `tools/art/enemies.py`. Semuanya berukuran 48×48 dan menghadap kanan. Sheet-nya berisi satu baris per animasi: idle 2 frame, serang 5 frame (antisipasi, maju, kontak ditahan 2×, mundur, kembali), kena hit 2 frame, dan KO 3 frame.
+
+Frame hanya menyimpan pose. Seberapa jauh musuh maju, terpental, atau jatuh ditulis sebagai `offsets` di `<id>_battle.json`, bersama durasi tiap frame, lalu diterapkan engine ke posisi sprite. Efek kilat putih saat kena hit dan fade saat KO juga dikerjakan engine.
+
+Adegan battle dicek dengan `tools/art/battle_mock.py`; party di mock ini masih memakai frame overworld. Animasinya bisa dilihat lewat `tools/art/anim_preview.py`.
+
+![Musuh Whisperwood, 2 frame idle](art/whisperwood_enemies_x6.png)
+
+![Animasi musuh: idle, serang, hit, KO](art/whisperwood_enemies_anim.gif)
+
+![Mock battle Whisperwood](art/whisperwood_battle_mock.png)
+
 ## 12. Boleh dan jangan
 
 | Boleh | Jangan |
