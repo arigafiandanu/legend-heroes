@@ -53,21 +53,22 @@ class PartyMember implements Vitals {
   bool get isKnockedOut => hp <= 0;
   int get expToNext => Progression.expToNext(level);
 
-  /// Adds EXP and returns every level reached.
+  /// Adds EXP and returns every level reached. A level up refills HP and
+  /// SP, except that a knocked-out member stays at 0 HP.
   List<int> gainExp(int amount) {
     final reached = <int>[];
     if (level >= Progression.levelCap) return reached;
     exp += amount;
     while (level < Progression.levelCap && exp >= expToNext) {
       exp -= expToNext;
-      final before = stats;
       level++;
-      final after = stats;
-      if (!isKnockedOut) hp += after.hp - before.hp;
-      sp += after.sp - before.sp;
       reached.add(level);
     }
     if (level >= Progression.levelCap) exp = 0;
+    if (reached.isNotEmpty) {
+      if (!isKnockedOut) hp = maxHp;
+      sp = maxSp;
+    }
     hp = min(hp, maxHp);
     sp = min(sp, maxSp);
     return reached;

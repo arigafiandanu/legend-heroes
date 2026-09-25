@@ -32,10 +32,21 @@ void main() {
       expect(m.exp, 5);
     });
 
-    test('level up raises current HP/SP by the max increase', () {
-      final m = PartyMember(def: kaelDef)..hp = 100;
+    test('level up refills HP and SP', () {
+      final m = PartyMember(def: kaelDef)
+        ..hp = 100
+        ..sp = 3;
       m.gainExp(20);
-      expect(m.hp, 100 + (235 - 220));
+      expect(m.hp, m.maxHp);
+      expect(m.sp, m.maxSp);
+    });
+
+    test('EXP without a level up leaves HP and SP alone', () {
+      final m = PartyMember(def: kaelDef)
+        ..hp = 100
+        ..sp = 3;
+      m.gainExp(19);
+      expect([m.hp, m.sp], [100, 3]);
     });
 
     test('knocked-out members stay at 0 HP after a level up', () {
