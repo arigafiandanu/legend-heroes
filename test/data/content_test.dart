@@ -87,6 +87,23 @@ void main() {
     });
   }
 
+  test('enemy battle sheets exist for enemies that name one', () {
+    for (final e in gameData.enemies.values.where((e) => e.sprite != null)) {
+      for (final ext in ['png', 'json']) {
+        expect(File('assets/images/${e.sprite}.$ext').existsSync(), isTrue, reason: '${e.id}.$ext');
+      }
+    }
+    expect(gameData.enemies.values.where((e) => e.sprite != null).length, 4, reason: 'the Whisperwood four');
+  });
+
+  test('map tilesets point at existing images', () {
+    for (final id in GameData.mapIds) {
+      for (final ts in map(id).tilesets) {
+        expect(File('assets/maps/${ts.image!.source}').existsSync(), isTrue, reason: '$id → ${ts.image!.source}');
+      }
+    }
+  });
+
   test('encounter groups only use known enemies', () {
     for (final table in gameData.encounters.values) {
       for (final g in table.groups) {

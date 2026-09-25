@@ -6,18 +6,26 @@ import 'package:flutter/painting.dart' show TextStyle, FontWeight;
 
 import '../../domain/attack_type.dart';
 import '../../domain/battle/battle_unit.dart';
+import 'battle_sheet.dart';
 import 'weakness_icon.dart';
 
-/// Colored blob standing in for an enemy battle sprite (none exist yet),
-/// with HP bar, shield count and weakness icons like the final HUD will have.
-class EnemyPlaceholder extends PositionComponent with HasPaint {
-  EnemyPlaceholder({required this.unit, required this.color, super.position})
+/// An enemy in battle: its animated sprite sheet when it has one, else a
+/// colored placeholder blob, plus HP bar, shield count and weakness icons.
+class EnemyView extends PositionComponent with HasPaint {
+  EnemyView({required this.unit, required this.color, this.sheet, super.position})
       : shield = unit.shield,
         hpRatio = 1,
-        super(size: Vector2(40, 36), anchor: Anchor.bottomCenter);
+        _anim = sheet == null ? null : AnimPlayback(sheet.meta),
+        super(
+          size: sheet == null ? Vector2(40, 36) : Vector2.all(sheet.meta.size),
+          anchor: Anchor.bottomCenter,
+        );
 
   final BattleUnit unit;
   final Color color;
+  final BattleSheet? sheet;
+  final AnimPlayback? _anim;
+  double _flash = 0;
 
   int shield;
   double hpRatio;
@@ -31,8 +39,43 @@ class EnemyPlaceholder extends PositionComponent with HasPaint {
     style: const TextStyle(fontSize: 7, color: Color(0xFFFFFFFF), fontWeight: FontWeight.bold),
   );
 
+  static final _shadow = Paint()..color = const Color(0x59000000);
+  static const _white = ColorFilter.mode(Color(0xFFFFFFFF), BlendMode.srcATop);
+  static const _grey = ColorFilter.mode(Color(0xFFA8A2B8), BlendMode.modulate);
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    _anim?.update(dt * 1000);
+    if (_flash > 0) _flash -= dt;
+  }
+
   @override
   void render(Canvas canvas) {
+    final anim = _anim;
+    if (anim != null) {
+      _renderSprite(canvas, anim);
+    } else {
+      _renderPlaceholder(canvas);
+    }
+    _renderHud(canvas);
+  }
+
+  void _renderSprite(Canvas canvas, AnimPlayback anim) {
+    final s = size.x;
+    final off = anim.offset;
+    // The shadow stays on the ground while a flyer falls.
+    canvas.drawOval(Rect.fromLTWH(off.dx + s * 0.2, s - 5, s * 0.6, 6),
+        Paint()..color = _shadow.color.withValues(alpha: _shadow.color.a * paint.color.a));
+    final src = Rect.fromLTWH(anim.frame * s, anim.clip.row * s, s, s);
+    final p = Paint()
+      ..filterQuality = FilterQuality.none
+      ..color = Color.fromRGBO(255, 255, 255, paint.color.a)
+      ..colorFilter = _flash > 0 ? _white : (broken ? _grey : null);
+    canvas.drawImageRect(sheet!.image, src, Rect.fromLTWH(off.dx, off.dy, s, s), p);
+  }
+
+  void _renderPlaceholder(Canvas canvas) {
     final alpha = paint.color.a;
     final body = broken ? Color.lerp(color, const Color(0xFF6E6E6E), 0.6)! : color;
     final outline = Color.lerp(body, const Color(0xFF000000), 0.55)!;
@@ -66,8 +109,10 @@ class EnemyPlaceholder extends PositionComponent with HasPaint {
           ..drawRect(Rect.fromLTWH(x, 14, 2, 3), pupil);
       }
     }
+  }
 
-    if (alpha < 0.05) return;
+  void _renderHud(Canvas canvas) {
+    if (paint.color.a < 0.05) return;
 
     // Name + HP bar above.
     _name.render(canvas, unit.name, Vector2(size.x / 2, -9), anchor: Anchor.bottomCenter);
@@ -93,11 +138,49 @@ class EnemyPlaceholder extends PositionComponent with HasPaint {
     }
   }
 
-  void shake() => add(SequenceEffect([
+  /// Plays the attack; completes when the blow lands (the contact frame).
+  Future<void> attack() {
+    final anim = _anim;
+    if (anim == null) {
+      add(SequenceEffect([
+        MoveByEffect(Vector2(10, 0), EffectController(duration: 0.1)),
+        MoveByEffect(Vector2(-10, 0), EffectController(duration: 0.12)),
+      ]));
+      return Future.delayed(const Duration(milliseconds: 100));
+    }
+    anim.play('attack');
+    final clip = anim.clip;
+    return Future.delayed(Duration(milliseconds: clip.msUntil(clip.contact ?? 0)));
+  }
+
+  /// Recoil from a hit, with a one-frame white flash (art bible §9).
+  void hit() {
+    final anim = _anim;
+    if (anim == null) {
+      add(SequenceEffect([
         MoveByEffect(Vector2(-3, 0), EffectController(duration: 0.04)),
         MoveByEffect(Vector2(6, 0), EffectController(duration: 0.06)),
         MoveByEffect(Vector2(-3, 0), EffectController(duration: 0.04)),
       ]));
+      return;
+    }
+    anim.play('hit');
+    _flash = 0.07;
+  }
 
-  void defeat() => add(OpacityEffect.fadeOut(EffectController(duration: 0.4)));
+  /// Collapse, then fade out.
+  void defeat() {
+    final anim = _anim;
+    anim?.play('ko');
+    final delay = anim == null ? 0.0 : anim.clip.totalMs / 1000;
+    add(OpacityEffect.fadeOut(EffectController(duration: 0.4, startDelay: delay)));
+  }
+}
+
+/// An enemy's loaded battle sheet image + metadata.
+class BattleSheet {
+  BattleSheet(this.image, this.meta);
+
+  final Image image;
+  final BattleSheetMeta meta;
 }

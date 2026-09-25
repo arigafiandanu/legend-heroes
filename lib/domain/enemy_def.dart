@@ -13,6 +13,7 @@ class EnemyDef {
     required this.keping,
     required this.color,
     this.isBoss = false,
+    this.sprite,
   });
 
   factory EnemyDef.fromJson(Map<String, dynamic> json) => EnemyDef(
@@ -28,6 +29,7 @@ class EnemyDef {
         keping: json['keping'] as int,
         color: int.parse((json['color'] as String).substring(1), radix: 16) | 0xFF000000,
         isBoss: json['boss'] as bool? ?? false,
+        sprite: json['sprite'] as String?,
       );
 
   final String id;
@@ -39,7 +41,11 @@ class EnemyDef {
   final int exp;
   final int keping;
 
-  /// ARGB placeholder color until enemy battle sprites exist.
+  /// ARGB placeholder color, used while an enemy has no battle sprite.
   final int color;
   final bool isBoss;
+
+  /// Battle sheet under assets/images/ without extension (`<sprite>.png` +
+  /// `<sprite>.json`), or null to draw the placeholder.
+  final String? sprite;
 }

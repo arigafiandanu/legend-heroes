@@ -1,17 +1,44 @@
-"""Builds the placeholder Tiled maps (.tmx) for M2.
+"""Builds the Tiled maps (.tmx).
 
-Maps are generated so they stay consistent with the tileset; after M2 they
-can be opened and edited directly in Tiled (assets/maps/*.tmx).
+Maps are generated so they stay consistent with their tileset; they can
+also be opened and edited directly in Tiled (assets/maps/*.tmx).
 Layers: ground, decor (below characters), foreground (above characters),
-object groups `collision` and `objects`.
+object groups `collision`, `objects` and `props`.
+
+Hollowmere still uses the procedural placeholder tileset. Whisperwood uses
+its final art: opaque base tiles + transparent decoration tiles
+(tools/art/whisperwood.py) and y-sorted prop sprites placed as points in
+the `props` group (kind = object name); the game reads their collision
+boxes from assets/data/props_<area>.json.
 """
+import json
+import math
+import os
 import random
+import sys
 from xml.sax.saxutils import quoteattr
 
 import tiles
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "art"))
+from autotile import clamped, clean, path_piece, stroke  # noqa: E402
+
 T = tiles.T
-ID, SOLID = tiles.ID, tiles.SOLID
+SOLID = tiles.SOLID
+
+
+class Tileset:
+    def __init__(self, name, image, names, cols):
+        self.name, self.image, self.names, self.cols = name, image, list(names), cols
+        self.id = {n: i for i, n in enumerate(self.names)}
+
+
+PLACEHOLDER = Tileset("placeholder", "placeholder_tiles.png", [n for n, _ in tiles.TILES], tiles.COLS)
+
+
+def area_tileset(area):
+    meta = json.load(open(f"../../assets/maps/{area}_tiles.json"))
+    return Tileset(area, f"{area}_tiles.png", meta["tiles"], meta["columns"]), meta
 
 
 def _prop(name, value):
@@ -22,11 +49,13 @@ def _prop(name, value):
 
 
 class MapBuilder:
-    def __init__(self, name, w, h, props, seed):
+    def __init__(self, name, w, h, props, seed, tileset=PLACEHOLDER):
         self.name, self.w, self.h, self.props = name, w, h, props
+        self.tileset = tileset
         self.r = random.Random(seed)
         self.layers = {k: [[None] * w for _ in range(h)] for k in ("ground", "decor", "foreground")}
         self.objects = []
+        self.prop_points = []  # (kind, x, y) in px, the sprite's bottom-centre base
         self.solids = []  # extra collision rects in px
 
     def inside(self, x, y):
@@ -86,6 +115,9 @@ class MapBuilder:
             self.set("decor", x + 6, y + j, "pillar")
         self.set("decor", x + 3, y + 3, "shrine")
 
+    def prop(self, kind, x, y):
+        self.prop_points.append((kind, round(x), round(y)))
+
     def obj(self, cls, name, x, y, w=0, h=0, **props):
         """Object in tile units; w=h=0 makes a point (feet position)."""
         self.objects.append((cls, name, x * T, y * T, w * T, h * T, props))
@@ -112,19 +144,21 @@ class MapBuilder:
         return rects
 
     def write(self, path):
+        ts = self.tileset
         out = [
             '<?xml version="1.0" encoding="UTF-8"?>',
             f'<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" '
-            f'width="{self.w}" height="{self.h}" tilewidth="{T}" tileheight="{T}" infinite="0" nextlayerid="6" nextobjectid="{len(self.objects) + 200}">',
+            f'width="{self.w}" height="{self.h}" tilewidth="{T}" tileheight="{T}" infinite="0" nextlayerid="7" '
+            f'nextobjectid="{len(self.objects) + len(self.prop_points) + 400}">',
             " <properties>",
             *[f'  <property name="{k}" value={quoteattr(str(v))}/>' for k, v in self.props.items()],
             " </properties>",
-            f' <tileset firstgid="1" name="placeholder" tilewidth="{T}" tileheight="{T}" tilecount="{len(tiles.TILES)}" columns="{tiles.COLS}">',
-            f'  <image source="placeholder_tiles.png" width="{tiles.COLS * T}" height="{((len(tiles.TILES) + tiles.COLS - 1) // tiles.COLS) * T}"/>',
+            f' <tileset firstgid="1" name="{ts.name}" tilewidth="{T}" tileheight="{T}" tilecount="{len(ts.names)}" columns="{ts.cols}">',
+            f'  <image source="{ts.image}" width="{ts.cols * T}" height="{((len(ts.names) + ts.cols - 1) // ts.cols) * T}"/>',
             " </tileset>",
         ]
         for lid, layer in enumerate(("ground", "decor", "foreground"), start=1):
-            rows = [",".join(str(ID[t] + 1) if t else "0" for t in row) for row in self.layers[layer]]
+            rows = [",".join(str(ts.id[t] + 1) if t else "0" for t in row) for row in self.layers[layer]]
             out += [f' <layer id="{lid}" name="{layer}" width="{self.w}" height="{self.h}">',
                     '  <data encoding="csv">', ",\n".join(rows), "  </data>", " </layer>"]
         oid = 1
@@ -144,6 +178,11 @@ class MapBuilder:
             if not (w or h):
                 out.append("   <point/>")
             out.append("  </object>")
+            oid += 1
+        out.append(" </objectgroup>")
+        out.append(' <objectgroup id="6" name="props">')
+        for kind, x, y in sorted(self.prop_points, key=lambda q: (q[2], q[1])):
+            out += [f'  <object id="{oid}" name="{kind}" class="prop" x="{x}" y="{y}">', "   <point/>", "  </object>"]
             oid += 1
         out += [" </objectgroup>", "</map>", ""]
         with open(path, "w") as f:
@@ -203,60 +242,89 @@ def hollowmere():
 
 
 def whisperwood_1():
-    m = MapBuilder("whisperwood_1", 48, 28, {"bgm": "whisperwood", "encounters": "whisperwood", "nameKey": "mapWhisperwood"}, seed=9)
-    m.fill([("forest", 10), ("forest2", 6), ("moss", 2), ("mushrooms", 0.4)])
-    # Winding path west → east.
-    y = 13
-    for x in range(0, 48):
-        if x in (10, 22, 34):
-            y = {10: 8, 22: 17, 34: 12}[x]
-        m.rect("ground", x, y, x, y + 1, "forest_path")
-        if x in (10, 22, 34):
-            prev = {10: 13, 22: 8, 34: 17}[x]
-            m.rect("ground", x, min(prev, y), x + 1, max(prev, y) + 1, "forest_path")
+    """Forest path west → east with two clearings. Final art: the path is a
+    3-wide autotiled trail, trees and rocks are y-sorted props."""
+    W, H = 48, 28
+    ts, meta = area_tileset("whisperwood")
+    m = MapBuilder("whisperwood_1", W, H, {"bgm": "whisperwood", "encounters": "whisperwood",
+                                           "nameKey": "mapWhisperwood", "props": "whisperwood"}, seed=9, tileset=ts)
+    path = clean(stroke([(-1, 14.5), (10.5, 14.5), (10.5, 9.5), (22.5, 9.5), (22.5, 17.5), (34.5, 17.5), (34.5, 12.5),
+                         (49, 12.5)], 1.45, W, H), W, H)
+    on_path = clamped(path, W, H)
     clearings = [(15, 19, 22, 25), (37, 2, 44, 8)]
-    for x0, y0, x1, y1 in clearings:
-        m.rect("ground", x0, y0, x1, y1, "moss")
 
-    def near_path(x, y):
-        return any(m.get("ground", x + dx, y + dy) == "forest_path" for dx in (-1, 0, 1, 2) for dy in (-1, 0, 1))
+    def in_clearing(x, y, pad=0):
+        return any(x0 - pad <= x <= x1 + pad and y0 - pad <= y <= y1 + pad for x0, y0, x1, y1 in clearings)
 
-    def in_clearing(x, y):
-        return any(x0 - 1 <= x <= x1 and y0 <= y <= y1 + 2 for x0, y0, x1, y1 in clearings)
+    floors = ["floor", "floor_b", "floor_sun", "floor_sun_b", "floor_shade", "floor_shade_b"]
+    decor = ["grass", "grass_b", "grass_tall", "flowers_blue", "flowers_pink", "flowers_white", "clover", "ferns",
+             "mushrooms", "litter", "pebbles", "twig"]
+    for y in range(H):
+        for x in range(W):
+            if (x, y) in path:
+                piece = path_piece(on_path, x, y)
+                m.set("ground", x, y, m.r.choice([piece] * 2 + meta["variants"].get(piece, [])))
+                continue
+            sunny = in_clearing(x, y)
+            weights = [6, 2, 4, 3, 0.3, 0.3] if sunny else [10, 4, 1.4, 1.2, 1.2, 1]
+            m.set("ground", x, y, m.r.choices(floors, weights)[0])
+            if m.r.random() < (0.4 if sunny else 0.28):
+                m.set("decor", x, y, m.r.choices(decor, [8, 5, 3, 2 if sunny else 1.4, 1.5 if sunny else 1,
+                                                         1.5 if sunny else 1, 2, 1.5, 0.6, 1.5, 1, 0.8])[0])
 
-    # Loose forest: jittered 3×3 grid, canopies never stacked on trunks.
-    for gy in range(2, 28, 3):
-        for gx in range(-1, 48, 3):
-            x, y = gx + m.r.randint(0, 1), gy + m.r.randint(0, 1)
-            area_free = m.free(x, y - 2, 2, 3) and all(
-                m.get("foreground", x + i, y + j) is None for i in (0, 1) for j in (-2, -1, 0))
-            if area_free and not near_path(x, y) and not in_clearing(x, y) and m.r.random() < 0.85:
-                m.tree(x, y, dark=True)
-    for x, yy in ((6, 16), (27, 10), (41, 20)):
-        if m.free(x, yy):
-            m.set("decor", x, yy, "log")
-    m.set("decor", 45, 11, "sign")
     m.obj("spawn", "west", 1, 14)
     m.obj("chest", "chest_a", 18, 22, 1, 1, item="herbal", count=2)
     m.obj("chest", "chest_b", 40, 5, 1, 1, item="tonik", count=1)
-    m.obj("chest", "chest_c", 29, 18, 1, 1, item="bulu_bara", count=1)
-    m.obj("sign", "sign_post", 45, 11, 1, 1, dialog="Sign_Post")
+    m.obj("chest", "chest_c", 29, 20, 1, 1, item="bulu_bara", count=1)
+    m.obj("sign", "sign_post", 45, 10, 1, 1, dialog="Sign_Post")
     m.obj("exit", "to_hollowmere", 0, 12, 1, 4, map="hollowmere", spawn="east")
     m.obj("exit", "to_post", 47, 11, 1, 4, blockedDialog="Path_Closed")
-    # Keep chests and the sign reachable: clear decor on/around them.
-    for cls, name, x, yy, w, h, props in m.objects:
-        tx, ty = int(x // T), int(yy // T)
-        for dx in (-1, 0, 1):
-            for dy in (-1, 0, 1):
-                if (tx + dx, ty + dy) != (45, 11):
-                    t = m.get("decor", tx + dx, ty + dy)
-                    if t and "trunk" in t:
-                        m.set("decor", tx + dx, ty + dy, None)
-                        m.set("decor", tx + dx + (1 if t.endswith("_l") else -1), ty + dy, None)
-                        for fy in (ty + dy - 1, ty + dy - 2):
-                            for fx in (tx + dx - 1, tx + dx, tx + dx + 1):
-                                if (m.get("foreground", fx, fy) or "").startswith("dcanopy"):
-                                    m.set("foreground", fx, fy, None)
+    m.prop("signpost", 45.5 * T, 11 * T - 1)
+
+    # Keep-out zones in px: objects need room to be reached.
+    keep_out = [(x + max(w, T) / 2, y + max(h, T) / 2, 30) for _, _, x, y, w, h, _ in m.objects]
+
+    def blocked(px, py, trunk=10):
+        tx, ty = int(px // T), int(py // T)
+        if any(on_path(tx + dx, ty + dy) for dx in (-1, 0, 1) for dy in (-1, 0)):
+            return True
+        if in_clearing(tx, ty, pad=0):
+            return True
+        return any(math.hypot(px - cx, py - cy) < r + trunk for cx, cy, r in keep_out)
+
+    placed = [(45.5 * T, 11 * T, 10)]
+
+    def hides_object(px, py):
+        """A tree whose canopy would cover a chest or sign."""
+        return any(abs(px - cx) < 34 and 0 < py - cy < 72 for cx, cy, _ in keep_out)
+
+    def try_place(kind, px, py, spacing):
+        if px < 8 or px > W * T - 8 or py < 20 or py > H * T + 30 or blocked(px, py):
+            return False
+        if "tree" in kind or kind == "pine":
+            if hides_object(px, py):
+                return False
+        if any(math.hypot(px - x, py - y) < max(spacing, s) for x, y, s in placed):
+            return False
+        placed.append((px, py, spacing))
+        m.prop(kind, px, py)
+        return True
+
+    # Undergrowth and the spreading Ashblight first, then trees fill the rest.
+    for kind, n, spacing in (("bush", 14, 22), ("rock", 6, 22), ("rock_small", 8, 16), ("log", 3, 30),
+                             ("stump", 5, 18)):
+        for _ in range(n * 30):
+            if try_place(kind, m.r.uniform(0, W * T), m.r.uniform(0, H * T), spacing):
+                n -= 1
+                if n == 0:
+                    break
+    for _ in range(400):  # blight thickens toward the east (the mine)
+        x = m.r.uniform(0, W * T)
+        if m.r.random() < (x / (W * T)) ** 2 * 0.5:
+            try_place("ashblight", x, m.r.uniform(0, H * T), 20)
+    for _ in range(1600):
+        try_place(m.r.choices(["big_tree", "big_tree_b", "pine", "small_tree"], [3, 3, 3, 2])[0],
+                  m.r.uniform(0, W * T), m.r.uniform(0, H * T + 24), 32)
     m.write("../../assets/maps/whisperwood_1.tmx")
 
 

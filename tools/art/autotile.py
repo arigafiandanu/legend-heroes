@@ -16,6 +16,48 @@ def path_piece(is_path, x, y):
             "nw": "path_nw", "ne": "path_ne", "sw": "path_sw", "se": "path_se"}.get(key, "path")
 
 
+def supported(is_path, x, y):
+    """True if the 13-piece set has a piece for this path cell."""
+    n, s, w, e = not is_path(x, y - 1), not is_path(x, y + 1), not is_path(x - 1, y), not is_path(x + 1, y)
+    if (n and s) or (w and e):
+        return False
+    gaps = {(dx, dy) for dx in (-1, 1) for dy in (-1, 1) if not is_path(x + dx, y + dy)}
+    # a diagonal gap is fine only on a corner the side piece already covers
+    covered = {(dx, dy) for dx, dy in gaps if (n and dy == -1) or (s and dy == 1) or (w and dx == -1) or (e and dx == 1)}
+    return len(gaps - covered) <= (0 if (n or s or w or e) else 1)
+
+
+def stroke(points, radius, w, h):
+    """Grid cells whose centre lies within `radius` cells of the polyline."""
+    import math
+    out = set()
+    for (x0, y0), (x1, y1) in zip(points, points[1:]):
+        dx, dy = x1 - x0, y1 - y0
+        for y in range(h):
+            for x in range(w):
+                px, py = x + 0.5, y + 0.5
+                t = max(0, min(1, ((px - x0) * dx + (py - y0) * dy) / (dx * dx + dy * dy)))
+                if math.hypot(px - x0 - t * dx, py - y0 - t * dy) <= radius:
+                    out.add((x, y))
+    return out
+
+
+def clamped(cells, w, h):
+    """is_path over `cells` where the path continues past the map edge."""
+    return lambda x, y: (min(max(x, 0), w - 1), min(max(y, 0), h - 1)) in cells
+
+
+def clean(cells, w, h):
+    """Drop cells the autotile can't draw until the shape is stable."""
+    cells = set(cells)
+    while True:
+        p = clamped(cells, w, h)
+        bad = {c for c in cells if not supported(p, *c)}
+        if not bad:
+            return cells
+        cells -= bad
+
+
 if __name__ == "__main__":
     # 2-wide horizontal path with a turn
     cells = {(x, y) for x in range(0, 6) for y in (2, 3)} | {(x, y) for x in (4, 5) for y in range(0, 4)}

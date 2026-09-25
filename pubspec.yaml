@@ -31,6 +31,8 @@ flutter:
   generate: true
   assets:
     - assets/images/
+    - assets/images/props/
+    - assets/images/enemies/
     - assets/data/
     - assets/maps/
     - assets/dialog/en/

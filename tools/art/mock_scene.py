@@ -13,7 +13,7 @@ import sys
 from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
 import palette
-from autotile import path_piece
+from autotile import clamped, clean, path_piece, stroke
 
 T = 16
 W, H = 30, 17
@@ -29,47 +29,9 @@ r = random.Random(4)
 
 # ---------------------------------------------------------------- path layout
 
-def stroke(points, radius):
-    """Cells whose centre lies within `radius` tiles of the polyline."""
-    out = set()
-    for (x0, y0), (x1, y1) in zip(points, points[1:]):
-        for y in range(H):
-            for x in range(W):
-                px, py = x + 0.5, y + 0.5
-                dx, dy = x1 - x0, y1 - y0
-                t = max(0, min(1, ((px - x0) * dx + (py - y0) * dy) / (dx * dx + dy * dy)))
-                if math.hypot(px - x0 - t * dx, py - y0 - t * dy) <= radius:
-                    out.add((x, y))
-    return out
-
-
-def supported(cells, x, y):
-    """True if the 13-piece autotile has a piece for this cell."""
-    p = lambda a, b: (min(max(a, 0), W - 1), min(max(b, 0), H - 1)) in cells  # path runs off-screen
-    n, s, w, e = not p(x, y - 1), not p(x, y + 1), not p(x - 1, y), not p(x + 1, y)
-    if (n and s) or (w and e):
-        return False
-    diag = {(dx, dy) for dx in (-1, 1) for dy in (-1, 1) if not p(x + dx, y + dy)}
-    # a diagonal gap is fine only on the corner the side piece already covers
-    allowed = {(dx, dy) for dx, dy in [(-1, -1), (1, -1), (-1, 1), (1, 1)]
-               if (n and dy == -1) or (s and dy == 1) or (w and dx == -1) or (e and dx == 1)}
-    extra = diag - allowed
-    return len(extra) <= (0 if (n or s or w or e) else 1)
-
-
-def clean(cells):
-    """Drop cells the autotile can't draw until the shape is stable."""
-    cells = set(cells)
-    while True:
-        bad = {c for c in cells if not supported(cells, *c)}
-        if not bad:
-            return cells
-        cells -= bad
-
-
-path = clean(stroke([(-1, 10.5), (11.5, 10.5), (11.5, 4.5), (31, 4.5)], 1.45)
-             | stroke([(21.5, 4.5), (21.5, 18)], 1.45))
-on_path = lambda a, b: (min(max(a, 0), W - 1), min(max(b, 0), H - 1)) in path
+path = clean(stroke([(-1, 10.5), (11.5, 10.5), (11.5, 4.5), (31, 4.5)], 1.45, W, H)
+             | stroke([(21.5, 4.5), (21.5, 18)], 1.45, W, H), W, H)
+on_path = clamped(path, W, H)
 
 # ---------------------------------------------------------------- ground
 

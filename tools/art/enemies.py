@@ -344,6 +344,8 @@ ANIMS = [
         (Pose(eyes="ko", squash=0.4), 240, (-4, 0)),  # last frame is held; the engine fades it
     ]),
 ]
+# Frame where the blow lands: the engine shows the damage from here.
+CONTACT = {"attack": 2}
 # A flyer drops to the ground instead of slumping in place.
 OFFSET_OVERRIDES = {"wisp_moth": {"ko": [(-3, 2), (-4, 6), (-4, 9)]}}
 
@@ -367,6 +369,8 @@ def build(out_dir):
             offsets = OFFSET_OVERRIDES.get(name, {}).get(anim, [o for _, _, o in frames])
             meta["anims"][anim] = {"row": row, "frames": len(frames), "loop": loop,
                                    "ms": [ms for _, ms, _ in frames], "offsets": [list(o) for o in offsets]}
+            if anim in CONTACT:
+                meta["anims"][anim]["contact"] = CONTACT[anim]
         sheet.image().save(f"{out_dir}/{name}_battle.png")
         with open(f"{out_dir}/{name}_battle.json", "w") as f:
             json.dump(meta, f, indent=1)

@@ -4,6 +4,7 @@ import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame_tiled/flame_tiled.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 import '../../domain/encounter.dart';
 import '../ashen_crest_game.dart';
@@ -12,6 +13,7 @@ import 'follower.dart';
 import 'map_layers.dart';
 import 'map_objects.dart';
 import 'player.dart';
+import 'props.dart';
 
 /// One Tiled map (`assets/maps/<id>.tmx`) with its party, NPCs and objects.
 class MapWorld extends World with HasGameReference<AshenCrestGame> {
@@ -40,6 +42,7 @@ class MapWorld extends World with HasGameReference<AshenCrestGame> {
   final List<Campfire> _fires = [];
   final List<Interactable> _interactables = [];
   final List<ExitZone> _exits = [];
+  final List<Prop> _props = [];
   final Map<String, Vector2> spawns = {};
 
   List<Rect> _solids() => [
@@ -47,6 +50,7 @@ class MapWorld extends World with HasGameReference<AshenCrestGame> {
         for (final n in _npcs) n.solid,
         for (final c in _chests) c.solid,
         for (final f in _fires) f.solid,
+        for (final p in _props) p.solid,
       ];
 
   @override
@@ -78,6 +82,14 @@ class MapWorld extends World with HasGameReference<AshenCrestGame> {
     for (final o in objects.objects) {
       _addObject(o);
     }
+    final area = map.properties.getValue<String>('props');
+    if (area != null) {
+      final sheet = await PropSheet.load(game.images, game.bundle ?? rootBundle, area);
+      final layer = map.layers.whereType<ObjectGroup>().where((g) => g.name == 'props').firstOrNull;
+      _props.addAll([
+        for (final o in layer?.objects ?? const <TiledObject>[]) Prop(sheet: sheet, kind: o.name, base: Vector2(o.x, o.y)),
+      ]);
+    }
 
     final start = startPosition ?? spawns[spawn] ?? spawns.values.firstOrNull ?? mapSize / 2;
     final state = game.state!;
@@ -93,7 +105,7 @@ class MapWorld extends World with HasGameReference<AshenCrestGame> {
       sheetPath: state.party.length > 1 ? state.party[1].def.sheet : state.party.first.def.sheet,
       leader: player,
     );
-    await addAll([ground, foreground, ..._npcs, ..._chests, ..._fires, follower, player]);
+    await addAll([ground, foreground, ..._props, ..._npcs, ..._chests, ..._fires, follower, player]);
   }
 
   void _addObject(TiledObject o) {

@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/extensions.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 import '../../core/constants.dart';
 import '../../core/l10n/gen/app_localizations.dart';
@@ -13,10 +14,11 @@ import '../../domain/battle/battle_event.dart';
 import '../../presentation/battle/battle_cubit.dart';
 import '../ashen_crest_game.dart';
 import '../character_sprite.dart';
-import 'enemy_placeholder.dart';
+import 'battle_sheet.dart';
+import 'enemy_view.dart';
 import 'popup_text.dart';
 
-/// Placeholder battle scene. Plays back engine events as simple animations.
+/// Battle scene. Plays back engine events as animations.
 /// Layout is in the 480×270 virtual space; wider screens see more backdrop.
 class BattleWorld extends World with HasGameReference<AshenCrestGame> {
   BattleWorld({required this.cubit, required this.data, required this.l10n});
@@ -25,7 +27,7 @@ class BattleWorld extends World with HasGameReference<AshenCrestGame> {
   final GameData data;
   final AppLocalizations l10n;
 
-  final Map<String, EnemyPlaceholder> _enemies = {};
+  final Map<String, EnemyView> _enemies = {};
   final Map<String, CharacterSprite> _party = {};
   final Map<String, Vector2> _home = {};
   StreamSubscription<List<BattleEvent>>? _sub;
@@ -47,12 +49,21 @@ class BattleWorld extends World with HasGameReference<AshenCrestGame> {
     add(_Backdrop());
     final enemies = cubit.engine.enemies;
     final slots = _enemySlots[enemies.length.clamp(1, 4) - 1];
+    final sheets = <String, BattleSheet>{};
     for (var i = 0; i < enemies.length; i++) {
       final u = enemies[i];
       final def = data.enemies[u.id.split('#').first]!;
-      final c = _enemies[u.id] = EnemyPlaceholder(
+      final sprite = def.sprite;
+      if (sprite != null && !sheets.containsKey(sprite)) {
+        sheets[sprite] = BattleSheet(
+          await game.images.load('$sprite.png'),
+          BattleSheetMeta.parse(await (game.bundle ?? rootBundle).loadString('assets/images/$sprite.json')),
+        );
+      }
+      final c = _enemies[u.id] = EnemyView(
         unit: u,
         color: Color(def.color),
+        sheet: sprite == null ? null : sheets[sprite],
         position: slots[i % slots.length].toVector2(),
       )..priority = slots[i % slots.length].dy.toInt();
       _home[u.id] = c.position.clone();
@@ -124,7 +135,13 @@ class BattleWorld extends World with HasGameReference<AshenCrestGame> {
         cubit
           ..onEventPlayed(e)
           ..announce('${cubit.engine.unit(unitId).name} · ${_actionLabel(action)}');
-        await _wait(450);
+        final enemy = _enemies[unitId];
+        if (enemy != null && (action is AttackAction || action is SkillAction)) {
+          await _wait(300); // time to read the announcement
+          await enemy.attack(); // damage shows as the blow lands
+        } else {
+          await _wait(450);
+        }
       case DamageDealt(:final targetId, :final amount, :final weakness, :final hpAfter):
         cubit.onEventPlayed(e);
         final view = _view(targetId)!;
@@ -132,7 +149,7 @@ class BattleWorld extends World with HasGameReference<AshenCrestGame> {
         if (enemy != null) {
           enemy
             ..hpRatio = hpAfter / enemy.unit.stats.hp
-            ..shake();
+            ..hit();
         } else {
           _shakeParty(view);
         }
