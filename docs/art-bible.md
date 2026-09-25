@@ -135,6 +135,16 @@ Peti (`assets/images/props/chest.png`, tertutup dan terbuka) dibuat dengan `tool
 
 ![Mock battle Whisperwood](art/whisperwood_battle_mock.png)
 
+## 11b. Contoh: Hollowmere
+
+Dibuat dengan `tools/art/hollowmere.py`. Rumputnya lebih terang dan hangat daripada hutan. Tileset-nya berisi jalan tanah, alun-alun berlapis batu, dan kolam, masing-masing dengan 13 tile tepi rumput dari `path_tile` yang sama dengan Whisperwood, ditambah lantai kuil dan pagar.
+
+Rumah, toko, kuil (atap dan dinding belakang, pilar, altar bara), pohon desa, lentera, tong, dan peti kayu dibuat sebagai prop yang di-y-sort. Prop yang memancarkan cahaya (lentera, altar, Ashblight) menyimpan `glow` di JSON-nya, dan engine menggambarnya sebagai cahaya additive.
+
+NPC sementara dibuat dengan palette swap dari sheet Kael atau Lira (`tools/art/npcs.py`). Ramp warnanya ditukar per indeks, dan aturan swap bisa dibatasi ke bagian kepala supaya rambut berubah sementara sepatu tetap. `tools/maps/preview.py` me-render peta mana pun beserta prop dan NPC-nya.
+
+![Peta Hollowmere](art/hollowmere_map.png)
+
 ## 12. Boleh dan jangan
 
 | Boleh | Jangan |

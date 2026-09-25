@@ -123,8 +123,7 @@
   <object id="7" name="hunter" class="npc" x="504.0" y="232.0">
    <properties>
     <property name="dialog" value="Hunter"/>
-    <property name="sheet" value="kael_sheet.png"/>
-    <property name="tint" value="#A08A62"/>
+    <property name="sheet" value="npc/hunter_sheet.png"/>
     <property name="facing" value="left"/>
    </properties>
    <point/>

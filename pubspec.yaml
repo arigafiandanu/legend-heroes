@@ -34,6 +34,7 @@ flutter:
     - assets/images/props/
     - assets/images/enemies/
     - assets/images/party/
+    - assets/images/npc/
     - assets/images/backdrops/
     - assets/data/
     - assets/maps/

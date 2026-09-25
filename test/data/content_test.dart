@@ -127,6 +127,15 @@ void main() {
     expect(map('whisperwood_1').properties.getValue<String>('backdrop'), 'whisperwood');
   });
 
+  test('NPC sheets exist', () {
+    for (final id in GameData.mapIds) {
+      for (final o in objects(map(id)).where((o) => o.type == 'npc')) {
+        final sheet = o.properties.getValue<String>('sheet')!;
+        expect(File('assets/images/$sheet').existsSync(), isTrue, reason: '$id/${o.name} → $sheet');
+      }
+    }
+  });
+
   test('map tilesets point at existing images', () {
     for (final id in GameData.mapIds) {
       for (final ts in map(id).tilesets) {

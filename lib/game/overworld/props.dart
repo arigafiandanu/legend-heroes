@@ -8,14 +8,22 @@ import 'package:flutter/services.dart' show AssetBundle;
 
 /// One prop kind in an area's sheet: where it is and what part of it blocks.
 class PropFrame {
-  const PropFrame({required this.src, required this.solid});
+  const PropFrame({required this.src, required this.solid, this.glow});
 
   factory PropFrame.fromJson(Map<String, dynamic> json) {
     double n(Object? v) => (v as num).toDouble();
     final s = json['solid'] as List;
+    final g = json['glow'] as Map<String, dynamic>?;
     return PropFrame(
       src: Rect.fromLTWH(n(json['x']), n(json['y']), n(json['w']), n(json['h'])),
       solid: Rect.fromLTWH(n(s[0]), n(s[1]), n(s[2]), n(s[3])),
+      glow: g == null
+          ? null
+          : PropGlow(
+              dy: n(g['dy']),
+              radius: n(g['radius']),
+              color: Color(int.parse((g['color'] as String).substring(1), radix: 16) | 0xFF000000),
+            ),
     );
   }
 
@@ -25,10 +33,22 @@ class PropFrame {
   /// Collision box relative to the prop's base (bottom-centre) point.
   final Rect solid;
 
+  /// Light the prop gives off (lanterns, shrine flames, Ashblight embers).
+  final PropGlow? glow;
+
   static Map<String, PropFrame> parseAll(String json) => {
         for (final e in (jsonDecode(json) as Map<String, dynamic>).entries)
           e.key: PropFrame.fromJson(e.value as Map<String, dynamic>),
       };
+}
+
+/// A glow centred [dy] px above a prop's base.
+class PropGlow {
+  const PropGlow({required this.dy, required this.radius, required this.color});
+
+  final double dy;
+  final double radius;
+  final Color color;
 }
 
 /// An area's prop sprites (`assets/images/props/<area>_props.png`) and frames

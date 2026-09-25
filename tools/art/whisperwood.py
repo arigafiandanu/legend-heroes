@@ -115,9 +115,19 @@ def _mirror(corner, x, y):
     return (T - 1 - x if "E" in corner else x), (T - 1 - y if "S" in corner else y)
 
 
-def path_tile(sides=(), inner=(), variant="", seed=0):
-    """Dirt path cell with grass along `sides` (N/S/E/W) and grass nibbles in
-    `inner` corners (NE/NW/SE/SW) where only the diagonal is grass."""
+def path_tile(sides=(), inner=(), variant="", seed=0, grass_tone=None, fill=None, shadow=None,
+              lip=None, specks=True):
+    """Path cell with grass along `sides` (N/S/E/W) and grass nibbles in
+    `inner` corners (NE/NW/SE/SW) where only the diagonal is grass.
+
+    Defaults draw the Whisperwood dirt trail; other areas pass their own
+    `grass_tone(x, y)`, `fill(x, y, own_noise)` (the path surface), the
+    `shadow` colour grass casts onto it, the `lip` colours of lit grass
+    edges, and `specks=False` for surfaces without pebbles."""
+    grass_tone = grass_tone or floor_tone
+    fill = fill or dirt_tone
+    shadow = shadow or DIRT[0]
+    lip = lip or (LEAF[3], MOSS[0])
     prof = {s: PROFILES[s + (variant if s in sides else "")] for s in "NSWE"}
     grass = [[False] * T for _ in range(T)]
     for y in range(T):
@@ -140,12 +150,14 @@ def path_tile(sides=(), inner=(), variant="", seed=0):
             if grass[y][x]:
                 # grass lip facing the light (dirt above or left of it)
                 lit = (y > 0 and not grass[y - 1][x]) or (x > 0 and not grass[y][x - 1])
-                c.set(x, y, (MOSS[0] if (x * 7 + y) % 5 == 0 else LEAF[3]) if lit else floor_tone(x, y))
+                c.set(x, y, (lip[1] if (x * 7 + y) % 5 == 0 else lip[0]) if lit else grass_tone(x, y))
             else:
-                # grass above or left casts a 1px shadow onto the dirt
-                shadow = (y > 0 and grass[y - 1][x]) or (x > 0 and grass[y][x - 1])
-                c.set(x, y, DIRT[0] if shadow else dirt_tone(x, y, own))
+                # grass above or left casts a 1px shadow onto the path
+                shaded = (y > 0 and grass[y - 1][x]) or (x > 0 and grass[y][x - 1])
+                c.set(x, y, shadow if shaded else fill(x, y, own))
 
+    if not specks:
+        return c
     r = random.Random(seed)
 
     def clear(x, y, pad):
@@ -394,7 +406,7 @@ def branch(c, x0, y0, x1, y1):
         c.set(x + 1, y, BARK[1])
 
 
-def big_tree(seed):
+def big_tree(seed, ramp=CANOPY):
     """48×64 oak: layered leaf clumps and a flared trunk."""
     c = Canvas(48, 64)
     r = random.Random(seed)
@@ -402,12 +414,12 @@ def big_tree(seed):
     branch(c, 23, 38, 14, 28)
     branch(c, 26, 37, 34, 29)
     canopy(c, [(24, 31, 16, 7, -0.12), (12, 25, 9, 8, -0.02), (36, 25, 9, 8, -0.06),
-               (24, 20, 15, 10, 0.02), (16, 13, 9, 7, 0.08), (32, 13, 9, 7, 0.05), (24, 10, 8, 5, 0.1)], r)
+               (24, 20, 15, 10, 0.02), (16, 13, 9, 7, 0.08), (32, 13, 9, 7, 0.05), (24, 10, 8, 5, 0.1)], r, ramp=ramp)
     c.outline()
     return c
 
 
-def big_tree_b(seed):
+def big_tree_b(seed, ramp=CANOPY):
     """48×64 oak leaning left, with a gap that shows a branch."""
     c = Canvas(48, 64)
     r = random.Random(seed)
@@ -415,16 +427,16 @@ def big_tree_b(seed):
     branch(c, 24, 40, 12, 30)
     branch(c, 27, 40, 37, 33)
     canopy(c, [(22, 30, 14, 7, -0.1), (36, 28, 8, 6, -0.08), (11, 23, 8, 7, 0.0),
-               (25, 20, 14, 9, 0.04), (17, 12, 8, 6, 0.1), (32, 13, 7, 6, 0.06)], r)
+               (25, 20, 14, 9, 0.04), (17, 12, 8, 6, 0.1), (32, 13, 7, 6, 0.06)], r, ramp=ramp)
     c.outline()
     return c
 
 
-def small_tree(seed):
+def small_tree(seed, ramp=CANOPY):
     c = Canvas(32, 48)
     r = random.Random(seed)
     trunk(c, 16, 26, 46, 2.5, flare=4)
-    canopy(c, [(16, 24, 10, 5, -0.12), (16, 16, 10, 7, 0.0), (15, 10, 6, 4, 0.1)], r, size=(3, 4.5))
+    canopy(c, [(16, 24, 10, 5, -0.12), (16, 16, 10, 7, 0.0), (15, 10, 6, 4, 0.1)], r, ramp=ramp, size=(3, 4.5))
     c.outline()
     return c
 
@@ -598,21 +610,27 @@ PROPS = {
     "rock_small": (rock_small, (-6, -5, 12, 5)),
     "log": (log, (-17, -8, 34, 7)),
     "stump": (stump, (-6, -6, 12, 6)),
-    "ashblight": (ashblight, (-6, -5, 12, 5)),
+    "ashblight": (ashblight, (-6, -5, 12, 5), {"dy": -10, "radius": 14, "color": "#EEA664"}),
     "signpost": (signpost, (-3, -5, 6, 5)),
 }
 
 
-def build_props(png, meta):
-    sprites = {name: fn(seed_of(name)) for name, (fn, _) in PROPS.items()}
+def build_props(png, meta, props=None):
+    """Packs prop sprites into one sheet + JSON. `props` maps name →
+    (sprite fn, collision box[, glow]); glow = {dy, radius, color} for a
+    light the game draws at the base (lighting.dart)."""
+    props = props or PROPS
+    sprites = {name: spec[0](seed_of(name)) for name, spec in props.items()}
     width = sum(s.w for s in sprites.values()) + 2 * len(sprites)
     height = max(s.h for s in sprites.values())
     sheet = Canvas(width, height)
     frames, x = {}, 0
     for name, s in sprites.items():
         sheet.paste(s, x, height - s.h)
-        bx, by, bw, bh = PROPS[name][1]
+        bx, by, bw, bh = props[name][1]
         frames[name] = {"x": x, "y": height - s.h, "w": s.w, "h": s.h, "solid": [bx, by, bw, bh]}
+        if len(props[name]) > 2:
+            frames[name]["glow"] = props[name][2]
         x += s.w + 2
     sheet.image().save(png)
     with open(meta, "w") as f:

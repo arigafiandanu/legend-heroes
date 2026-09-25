@@ -200,48 +200,99 @@ class MapBuilder:
 
 
 def hollowmere():
-    m = MapBuilder("hollowmere", 40, 24, {"bgm": "hollowmere", "nameKey": "mapHollowmere"}, seed=3)
-    m.fill([("grass", 10), ("grass2", 6), ("flowers", 1)])
-    m.rect("ground", 0, 12, 39, 13, "dirt")          # main road to the east gate
-    m.rect("ground", 19, 7, 20, 21, "dirt")          # north–south road
-    m.rect("ground", 15, 10, 24, 15, "plaza")        # village square
-    m.temple(16, 2)
-    m.rect("ground", 19, 7, 20, 9, "dirt")
-    elder_door = m.house(4, 4)
-    shop_door = m.house(30, 4)
-    home_door = m.house(5, 16)
-    m.house(29, 16)
-    for dx, dy in ((elder_door, 0), (shop_door, 0), (home_door, 0)):
-        x, y = dx
-        m.rect("ground", x, y, x, 11, "dirt") if y <= 11 else m.rect("ground", x, 14, x, y, "dirt")
-    m.rect("ground", 31, 14, 31, 19, "dirt")
-    m.rect("ground", 9, 8, 12, 9, "water")            # small pond by the elder's house
-    m.rect("decor", 9, 8, 12, 9, "water")
+    """The home village. Final art: dirt roads and a paved square autotiled
+    against the grass, a pond, and houses, shrine, trees and lanterns as
+    y-sorted props. Object positions are unchanged from the M2 layout."""
+    W, H = 40, 24
+    ts, meta = area_tileset("hollowmere")
+    m = MapBuilder("hollowmere", W, H, {"bgm": "hollowmere", "nameKey": "mapHollowmere", "props": "hollowmere"},
+                   seed=3, tileset=ts)
+
+    def cells(x0, y0, x1, y1):
+        return {(x, y) for x in range(x0, x1 + 1) for y in range(y0, y1 + 1)}
+
+    houses = [("house", 4, 4), ("shop", 30, 4), ("house", 5, 16), ("house", 29, 16)]
+    doors = [(x + 2, y + 4) for _, x, y in houses]  # tile just in front of each door
+    road = cells(0, 12, 39, 13) | cells(19, 7, 20, 21)
+    for x, y in doors:
+        # north houses: a 3-wide lane down to the main road; south houses face
+        # away from it, so they get a doorstep instead
+        road |= cells(x - 1, y, x + 1, 11) if y <= 11 else cells(x - 1, y, x + 1, y + 1)
+    plaza = cells(15, 10, 24, 15)
+    temple_floor = cells(16, 4, 22, 6)
+    walk = clean(road | plaza | temple_floor, W, H) | temple_floor
+    water = clean(cells(9, 8, 12, 9), W, H)
+    on_walk, on_water = clamped(walk, W, H), clamped(water, W, H)
+
+    for y in range(H):
+        for x in range(W):
+            if (x, y) in temple_floor:
+                m.set("ground", x, y, "temple_floor")
+            elif (x, y) in walk:
+                piece = path_piece(on_walk, x, y)
+                surface = "plaza" if (x, y) in plaza else "road"
+                name = surface + piece[len("path"):]
+                m.set("ground", x, y, m.r.choice([name] * 3 + meta["variants"].get(name, [])))
+            elif (x, y) in water:
+                m.set("ground", x, y, "water" + path_piece(on_water, x, y)[len("path"):])
+            else:
+                m.set("ground", x, y, m.r.choices(["grass", "grass_b", "grass_sun", "grass_sun_b"], [8, 4, 2, 2])[0])
+                if m.r.random() < 0.22:
+                    m.set("decor", x, y, m.r.choices(["tuft", "tuft_b", "flowers_blue", "flowers_pink",
+                                                       "flowers_white", "clover", "pebbles"], [6, 4, 2, 2, 2, 2, 1])[0])
+    m.solids.append((9 * T + 2, 8 * T + 3, 4 * T - 4, 2 * T - 5))  # pond
     for x in range(14, 26):
         if x not in (19, 20):
             m.set("decor", x, 16, "fence")
-    # Border forest (gap on the east edge for the gate road).
-    for x in range(0, 40, 2):
-        if not 15 <= x <= 23:
-            m.tree(x, 2)
-        if x not in (18, 20):
-            m.tree(x, 23)
-    for y in range(5, 23, 3):
-        m.tree(0, y)
-        if not 9 <= y <= 15:
-            m.tree(38, y)
-    for x, y in ((14, 8), (26, 8), (13, 20), (25, 19), (35, 20)):
-        if m.free(x, y - 2, 2, 3):
-            m.tree(x, y)
-    for x, y, t in ((10, 10, "bush"), (27, 11, "bush"), (3, 13, "rock"), (36, 16, "bush"), (24, 11, "sign")):
-        m.set("decor", x, y, t)
+            m.solids.append((x * T, 16 * T + 5, T, 7))
+    for x, y in ((12, 15), (12, 17), (26, 9), (8, 10)):  # flower beds by the houses and square
+        m.set("decor", x, y, "flower_bed")
 
-    m.obj("spawn", "start", home_door[0] + 0.5, home_door[1] + 0.9)
+    # Props. Occupied cells keep trees off roads, buildings and the pond.
+    taken = set(walk) | water | cells(14, 16, 25, 16)
+    for kind, x, y in houses:
+        m.prop(kind, (x + 2.5) * T, (y + 4) * T)
+        taken |= cells(x, y, x + 4, y + 3)
+    m.prop("temple_back", 19.5 * T, 4.5 * T)
+    m.prop("pillar", 16.5 * T, 7 * T)
+    m.prop("pillar", 22.5 * T, 7 * T)
+    m.prop("shrine", 19.5 * T, 6 * T)
+    taken |= cells(16, 2, 22, 6)
+
+    def tree(x, y, kinds=("tree", "tree_b", "tree", "tree_small")):
+        """Tree whose trunk stands on cell (x, y), canopy over the two cells above."""
+        if cells(x, y - 2, x + 1, y) & taken:
+            return
+        m.prop(m.r.choice(kinds), (x + 1) * T, (y + 1) * T)
+        taken.update(cells(x, y - 2, x + 1, y))
+
+    for x in range(0, 40, 2):  # border forest, gap on the east edge for the gate road
+        if not 15 <= x <= 23:
+            tree(x, 2)
+        if x not in (18, 20):
+            tree(x, 23)
+    for y in range(5, 23, 3):
+        tree(0, y)
+        if not 9 <= y <= 15:
+            tree(38, y)
+    for x, y in ((14, 8), (26, 8), (13, 20), (25, 19), (35, 20)):
+        tree(x, y)
+    for kind, x, y in (("bush", 10, 10), ("bush", 27, 11), ("rock", 3, 13), ("bush", 36, 16)):
+        m.prop(kind, (x + 0.5) * T, (y + 1) * T)
+    m.prop("signpost", 24.5 * T, 12 * T - 1)
+    for x, y in ((14, 10), (26, 10), (14, 15), (25, 15), (37, 10), (37, 15), (21, 8)):
+        m.prop("lantern", (x + 0.5) * T, (y + 1) * T - 2)
+    for kind, x, y in (("barrel", 35.5, 8), ("crate", 36.6, 8.2), ("barrel", 10.5, 20)):
+        m.prop(kind, x * T, y * T)
+
+    home = doors[2]
+    m.obj("spawn", "start", home[0] + 0.5, home[1] + 0.9)
     m.obj("spawn", "east", 37, 13)
-    m.obj("npc", "elder", 18.5, 9, dialog="Elder", sheet="kael_sheet.png", tint="#9A9AA6", facing="down")
-    m.obj("npc", "merchant", shop_door[0] + 1.5, shop_door[1] + 1, dialog="Merchant", sheet="lira_sheet.png", tint="#C9A05A", facing="down")
-    m.obj("npc", "child", 10.5, 14, dialog="Child", sheet="lira_sheet.png", tint="#8FB0E0", facing="right", wander=1)
-    m.obj("npc", "guard", 36.5, 11.5, dialog="Guard", sheet="kael_sheet.png", tint="#7A8A6A", facing="left")
+    shop = doors[1]
+    m.obj("npc", "elder", 18.5, 9, dialog="Elder", sheet="npc/elder_sheet.png", facing="down")
+    m.obj("npc", "merchant", shop[0] + 1.5, shop[1] + 1, dialog="Merchant", sheet="npc/merchant_sheet.png", facing="down")
+    m.obj("npc", "child", 10.5, 14, dialog="Child", sheet="npc/child_sheet.png", facing="right", wander=1)
+    m.obj("npc", "guard", 36.5, 11.5, dialog="Guard", sheet="npc/guard_sheet.png", facing="left")
     m.obj("campfire", "square_fire", 19, 12, 2, 2, dialog="Campfire")
     m.obj("chest", "chest_1", 3, 18, 1, 1, item="herbal", count=2)
     m.obj("sign", "sign_east", 24, 11, 1, 1, dialog="Sign_Whisperwood")
@@ -379,7 +430,7 @@ def whisperwood_2():
 
     m.obj("spawn", "west", 2, 13)
     m.obj("spawn", "east", 45, 15)
-    m.obj("npc", "hunter", 31.5, 14.5, dialog="Hunter", sheet="kael_sheet.png", tint="#A08A62", facing="left")
+    m.obj("npc", "hunter", 31.5, 14.5, dialog="Hunter", sheet="npc/hunter_sheet.png", facing="left")
     m.obj("chest", "chest_d", 33, 23, 1, 1, item="penawar", count=2)
     m.obj("chest", "chest_secret", 15, 3, 1, 1, item="bulu_bara", count=2, requiresFlag="ww_secret")
     m.obj("exit", "to_whisperwood_1", 0, 11, 1, 4, map="whisperwood_1", spawn="east")

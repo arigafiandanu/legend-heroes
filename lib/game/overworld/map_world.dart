@@ -107,7 +107,8 @@ class MapWorld extends World with HasGameReference<AshenCrestGame> {
       ],
       glows: [
         for (final (i, p) in _props.indexed)
-          if (p.kind == 'ashblight') Glow(p.position.toOffset().translate(0, -10), phase: i * 1.7),
+          if (p.frame.glow case final g?)
+            Glow(p.position.toOffset().translate(0, g.dy), radius: g.radius, color: g.color, phase: i * 1.7),
       ],
     );
     final lit = lighting.ambient != null || lighting.shafts.isNotEmpty || lighting.glows.isNotEmpty;
