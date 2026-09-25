@@ -5,9 +5,8 @@ also be opened and edited directly in Tiled (assets/maps/*.tmx).
 Layers: ground, decor (below characters), foreground (above characters),
 object groups `collision`, `objects` and `props`.
 
-Hollowmere still uses the procedural placeholder tileset. Whisperwood uses
-its final art: opaque base tiles + transparent decoration tiles
-(tools/art/whisperwood.py) and y-sorted prop sprites placed as points in
+Each area has its final tileset: opaque base tiles + transparent decoration
+tiles (tools/art/<area>.py) and y-sorted prop sprites placed as points in
 the `props` group (kind = object name); the game reads their collision
 boxes from assets/data/props_<area>.json.
 """
@@ -18,22 +17,18 @@ import random
 import sys
 from xml.sax.saxutils import quoteattr
 
-import tiles
-
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "art"))
 from autotile import clamped, clean, path_piece, stroke  # noqa: E402
 
-T = tiles.T
-SOLID = tiles.SOLID
+T = 16
+# Decor tiles that block movement (whole tile).
+SOLID = {"fence"}
 
 
 class Tileset:
     def __init__(self, name, image, names, cols):
         self.name, self.image, self.names, self.cols = name, image, list(names), cols
         self.id = {n: i for i, n in enumerate(self.names)}
-
-
-PLACEHOLDER = Tileset("placeholder", "placeholder_tiles.png", [n for n, _ in tiles.TILES], tiles.COLS)
 
 
 def area_tileset(area):
@@ -49,7 +44,7 @@ def _prop(name, value):
 
 
 class MapBuilder:
-    def __init__(self, name, w, h, props, seed, tileset=PLACEHOLDER):
+    def __init__(self, name, w, h, props, seed, tileset):
         self.name, self.w, self.h, self.props = name, w, h, props
         self.tileset = tileset
         self.r = random.Random(seed)
@@ -69,53 +64,6 @@ class MapBuilder:
     def get(self, layer, x, y):
         return self.layers[layer][y][x] if self.inside(x, y) else None
 
-    def fill(self, choices):
-        names, weights = zip(*choices)
-        for y in range(self.h):
-            for x in range(self.w):
-                self.set("ground", x, y, self.r.choices(names, weights)[0])
-
-    def rect(self, layer, x0, y0, x1, y1, tile):
-        for y in range(y0, y1 + 1):
-            for x in range(x0, x1 + 1):
-                self.set(layer, x, y, tile)
-
-    def free(self, x, y, w=1, h=1):
-        return all(self.inside(x + i, y + j) and self.get("decor", x + i, y + j) is None
-                   and self.get("ground", x + i, y + j) not in ("dirt", "plaza", "forest_path", "temple_floor")
-                   for i in range(w) for j in range(h))
-
-    def tree(self, x, y, dark=False):
-        """2×3 tree: trunk base at row y, canopy on the two rows above."""
-        p = "d" if dark else ""
-        self.set("decor", x, y, p + "trunk_l")
-        self.set("decor", x + 1, y, p + "trunk_r")
-        for dx, dy, part in ((0, -2, "tl"), (1, -2, "tr"), (0, -1, "bl"), (1, -1, "br")):
-            self.set("foreground", x + dx, y + dy, f"{p}canopy_{part}")
-
-    def house(self, x, y):
-        """5×4: roof (walkable, drawn above characters), front wall solid."""
-        roof = ["roof_l", "roof", "roof", "roof", "roof_r"]
-        for i, t in enumerate(roof):
-            self.set("foreground", x + i, y, t)
-            self.set("foreground", x + i, y + 1, t)
-        for i, t in enumerate(["wall", "wall_window", "wall", "wall_window", "wall"]):
-            self.set("decor", x + i, y + 2, t)
-        for i, t in enumerate(["wall", "wall", "door", "wall", "wall"]):
-            self.set("decor", x + i, y + 3, t)
-        return (x + 2, y + 4)  # tile just in front of the door
-
-    def temple(self, x, y):
-        """7×5 Crest shrine: roof above, pillars and the ember shrine."""
-        for j in (0, 1):
-            for i in range(7):
-                self.set("foreground", x + i, y + j, "roof_l" if i == 0 else "roof_r" if i == 6 else "roof")
-        self.rect("ground", x, y + 2, x + 6, y + 4, "temple_floor")
-        for j in (2, 3, 4):
-            self.set("decor", x, y + j, "pillar")
-            self.set("decor", x + 6, y + j, "pillar")
-        self.set("decor", x + 3, y + 3, "shrine")
-
     def light(self, kind, x, y, w, h):
         """Light shape in px; `shaft` = warm light through the canopy (game: lighting.dart)."""
         self.lights.append((kind, round(x), round(y), round(w), round(h)))
@@ -132,15 +80,12 @@ class MapBuilder:
         for y in range(self.h):
             x = 0
             while x < self.w:
-                t = self.get("decor", x, y)
-                if t in SOLID and not t.endswith(("trunk_l", "trunk_r")):
+                if self.get("decor", x, y) in SOLID:
                     x0 = x
-                    while x < self.w and self.get("decor", x, y) in SOLID and not self.get("decor", x, y).endswith(("trunk_l", "trunk_r")):
+                    while x < self.w and self.get("decor", x, y) in SOLID:
                         x += 1
                     rects.append((x0 * T, y * T, (x - x0) * T, T))
                     continue
-                if t and t.endswith("trunk_l"):
-                    rects.append((x * T + 8, y * T + 4, 16, 10))  # narrow trunk box
                 x += 1
         rects += self.solids
         # Map borders
@@ -442,7 +387,6 @@ def whisperwood_2():
 
 
 if __name__ == "__main__":
-    tiles.build("../../assets/maps/placeholder_tiles.png")
     hollowmere()
     whisperwood_1()
     whisperwood_2()
