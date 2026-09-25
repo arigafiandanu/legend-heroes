@@ -98,7 +98,9 @@ Prinsip: antisipasi 1 frame sebelum serangan, dan squash/stretch maksimal 1 px.
 ## 10. Format file
 
 - PNG RGBA, alpha 0/255, **tanpa** color profile yang menggeser warna.
-- **Tileset:** grid 16×16, 8 kolom per baris, tanpa jarak antar-tile. Tile yang berkaitan (misalnya 13 tile tepi jalan) berada di baris yang sama.
+- **Tileset:** grid 16×16, 8 kolom per baris, tanpa jarak antar-tile. Urutan nama tile disimpan di `<area>_tiles.json` di samping PNG-nya.
+- **Tanah dua layer:** tile dasar opak (varian warna rumput, jalan) di layer ground, lalu tile dekorasi transparan (rumput, bunga, semanggi, ranting) di layer decor. Dengan begitu, dekorasi bisa dipasang di atas varian tanah mana pun.
+- **Varian tanpa jahitan:** semua varian satu material memakai tepi tile yang identik; perbedaannya hanya di bagian tengah. Karena itu, varian mana pun bisa bersebelahan dengan varian lain.
 - **Prop** (pohon, batu, semak, batang tumbang, papan): **bukan tile**, tetapi sprite yang di-y-sort seperti karakter, supaya karakter bisa berdiri di depan maupun di belakangnya. Sheet `assets/images/props/<area>_props.png` + `assets/data/props_<area>.json` (frame + kotak collision relatif ke titik dasar).
 - **Tepi jalan:** 13 tile autotile (tengah, 4 sisi, 4 sudut luar, 4 sudut dalam), dipilih otomatis oleh `tools/art/autotile.py`.
 - **Sprite sheet:** satu baris per arah atau animasi, kolom per frame. Urutan arah: bawah, kiri, kanan, atas (sama seperti sheet Kael/Lira).
@@ -107,9 +109,11 @@ Prinsip: antisipasi 1 frame sebelum serangan, dan squash/stretch maksimal 1 px.
 
 ## 11. Contoh: Whisperwood
 
-Dibuat dengan `tools/art/whisperwood.py` (tile + prop) dan dicek dalam adegan dengan `tools/art/mock_scene.py`.
+Dibuat dengan `tools/art/whisperwood.py` (tile + prop) dan dicek dalam adegan dengan `tools/art/mock_scene.py`. Mock ini juga mensimulasikan bagian engine dari §9, yaitu bayangan elips, overlay hutan, berkas cahaya hangat, dan vignette. Dengan `--flat`, mock menampilkan art mentahnya saja.
 
 ![Mock Whisperwood 480×270](art/whisperwood_mock.png)
+
+![Mock Whisperwood tanpa efek engine](art/whisperwood_mock_flat.png)
 
 ## 12. Boleh dan jangan
 

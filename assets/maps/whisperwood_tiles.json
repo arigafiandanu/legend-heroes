@@ -1,0 +1,74 @@
+{
+ "columns": 8,
+ "tiles": [
+  "floor",
+  "floor_b",
+  "floor_sun",
+  "floor_sun_b",
+  "floor_shade",
+  "floor_shade_b",
+  "path",
+  "path_n",
+  "path_s",
+  "path_w",
+  "path_e",
+  "path_nw",
+  "path_ne",
+  "path_sw",
+  "path_se",
+  "path_in_nw",
+  "path_in_ne",
+  "path_in_sw",
+  "path_in_se",
+  "path_b",
+  "path_c",
+  "path_n_b",
+  "path_s_b",
+  "path_w_b",
+  "path_e_b",
+  "grass",
+  "grass_b",
+  "grass_tall",
+  "flowers_blue",
+  "flowers_pink",
+  "flowers_white",
+  "clover",
+  "ferns",
+  "mushrooms",
+  "litter",
+  "pebbles",
+  "twig"
+ ],
+ "decor": [
+  "grass",
+  "grass_b",
+  "grass_tall",
+  "flowers_blue",
+  "flowers_pink",
+  "flowers_white",
+  "clover",
+  "ferns",
+  "mushrooms",
+  "litter",
+  "pebbles",
+  "twig"
+ ],
+ "variants": {
+  "path": [
+   "path_b",
+   "path_c"
+  ],
+  "path_n": [
+   "path_n_b"
+  ],
+  "path_s": [
+   "path_s_b"
+  ],
+  "path_w": [
+   "path_w_b"
+  ],
+  "path_e": [
+   "path_e_b"
+  ]
+ }
+}
