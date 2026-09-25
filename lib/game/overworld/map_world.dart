@@ -10,6 +10,7 @@ import '../../domain/encounter.dart';
 import '../ashen_crest_game.dart';
 import '../character_sprite.dart';
 import 'follower.dart';
+import 'lighting.dart';
 import 'map_layers.dart';
 import 'map_objects.dart';
 import 'player.dart';
@@ -51,7 +52,8 @@ class MapWorld extends World with HasGameReference<AshenCrestGame> {
   List<Rect> _solids() => [
         ..._walls,
         for (final n in _npcs) n.solid,
-        for (final c in _chests) c.solid,
+        for (final c in _chests)
+          if (c.shown) c.solid,
         for (final f in _fires) f.solid,
         for (final p in _props) p.solid,
       ];
@@ -95,6 +97,21 @@ class MapWorld extends World with HasGameReference<AshenCrestGame> {
       ]);
     }
 
+    final lightLayer = map.layers.whereType<ObjectGroup>().where((g) => g.name == 'lights').firstOrNull;
+    final lighting = Lighting(
+      size: Size(mapSize.x, mapSize.y),
+      ambient: parseHexColor(map.properties.getValue<String>('ambient')),
+      shafts: [
+        for (final o in lightLayer?.objects ?? const <TiledObject>[])
+          if (o.name == 'shaft') LightShaft(Rect.fromLTWH(o.x, o.y, o.width, o.height)),
+      ],
+      glows: [
+        for (final (i, p) in _props.indexed)
+          if (p.kind == 'ashblight') Glow(p.position.toOffset().translate(0, -10), phase: i * 1.7),
+      ],
+    );
+    final lit = lighting.ambient != null || lighting.shafts.isNotEmpty || lighting.glows.isNotEmpty;
+
     final start = startPosition ?? spawns[spawn] ?? spawns.values.firstOrNull ?? mapSize / 2;
     final state = game.state!;
     player = Player(
@@ -109,7 +126,7 @@ class MapWorld extends World with HasGameReference<AshenCrestGame> {
       sheetPath: state.party.length > 1 ? state.party[1].def.sheet : state.party.first.def.sheet,
       leader: player,
     );
-    await addAll([ground, foreground, ..._props, ..._npcs, ..._chests, ..._fires, follower, player]);
+    await addAll([ground, foreground, ..._props, ..._npcs, ..._chests, ..._fires, follower, player, if (lit) lighting]);
   }
 
   void _addObject(TiledObject o) {
@@ -123,7 +140,7 @@ class MapWorld extends World with HasGameReference<AshenCrestGame> {
           sheetPath: prop('sheet') ?? 'kael_sheet.png',
           dialogNode: prop('dialog')!,
           onTalk: game.runDialog,
-          tint: _parseColor(prop('tint')),
+          tint: parseHexColor(prop('tint')) ?? const Color(0xFFFFFFFF),
           position: Vector2(o.x, o.y),
           facing: Facing.values.byName(prop('facing') ?? 'down'),
         );
@@ -131,8 +148,10 @@ class MapWorld extends World with HasGameReference<AshenCrestGame> {
         _interactables.add(npc);
       case 'chest':
         final key = '$mapId/${o.name}';
+        final flag = prop('requiresFlag');
         final chest = Chest(
           rect: rect,
+          revealed: flag == null ? null : () => game.hasFlag(flag),
           opened: game.state!.openedChests.contains(key),
           onOpen: (c) => game.openChest(c, key, prop('item')!, o.properties.getValue<int>('count') ?? 1),
         );
@@ -155,9 +174,6 @@ class MapWorld extends World with HasGameReference<AshenCrestGame> {
     }
   }
 
-  static Color _parseColor(String? hex) =>
-      hex == null ? const Color(0xFFFFFFFF) : Color(int.parse(hex.substring(1), radix: 16) | 0xFF000000);
-
   @override
   void onMount() {
     super.onMount();
@@ -174,6 +190,7 @@ class MapWorld extends World with HasGameReference<AshenCrestGame> {
     Interactable? best;
     var bestDistance = double.infinity;
     for (final i in _interactables) {
+      if (i is Chest && !i.shown) continue;
       final inFront = i.area.contains(probe);
       final d = (i.area.center - feet).distance;
       if ((inFront || i.area.inflate(4).contains(feet)) && d < bestDistance) {

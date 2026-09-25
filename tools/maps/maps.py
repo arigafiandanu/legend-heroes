@@ -56,6 +56,7 @@ class MapBuilder:
         self.layers = {k: [[None] * w for _ in range(h)] for k in ("ground", "decor", "foreground")}
         self.objects = []
         self.prop_points = []  # (kind, x, y) in px, the sprite's bottom-centre base
+        self.lights = []  # (kind, x, y, w, h) in px
         self.solids = []  # extra collision rects in px
 
     def inside(self, x, y):
@@ -115,6 +116,10 @@ class MapBuilder:
             self.set("decor", x + 6, y + j, "pillar")
         self.set("decor", x + 3, y + 3, "shrine")
 
+    def light(self, kind, x, y, w, h):
+        """Light shape in px; `shaft` = warm light through the canopy (game: lighting.dart)."""
+        self.lights.append((kind, round(x), round(y), round(w), round(h)))
+
     def prop(self, kind, x, y):
         self.prop_points.append((kind, round(x), round(y)))
 
@@ -148,7 +153,7 @@ class MapBuilder:
         out = [
             '<?xml version="1.0" encoding="UTF-8"?>',
             f'<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" '
-            f'width="{self.w}" height="{self.h}" tilewidth="{T}" tileheight="{T}" infinite="0" nextlayerid="7" '
+            f'width="{self.w}" height="{self.h}" tilewidth="{T}" tileheight="{T}" infinite="0" nextlayerid="8" '
             f'nextobjectid="{len(self.objects) + len(self.prop_points) + 400}">',
             " <properties>",
             *[f'  <property name="{k}" value={quoteattr(str(v))}/>' for k, v in self.props.items()],
@@ -183,6 +188,11 @@ class MapBuilder:
         out.append(' <objectgroup id="6" name="props">')
         for kind, x, y in sorted(self.prop_points, key=lambda q: (q[2], q[1])):
             out += [f'  <object id="{oid}" name="{kind}" class="prop" x="{x}" y="{y}">', "   <point/>", "  </object>"]
+            oid += 1
+        out.append(" </objectgroup>")
+        out.append(' <objectgroup id="7" name="lights">')
+        for kind, x, y, w, h in self.lights:
+            out.append(f'  <object id="{oid}" name="{kind}" class="light" x="{x}" y="{y}" width="{w}" height="{h}"/>')
             oid += 1
         out += [" </objectgroup>", "</map>", ""]
         with open(path, "w") as f:
@@ -241,18 +251,15 @@ def hollowmere():
     m.write("../../assets/maps/hollowmere.tmx")
 
 
-def whisperwood_1():
-    """Forest path west → east with two clearings. Final art: the path is a
-    3-wide autotiled trail, trees and rocks are y-sorted props."""
-    W, H = 48, 28
-    ts, meta = area_tileset("whisperwood")
-    m = MapBuilder("whisperwood_1", W, H, {"bgm": "whisperwood", "encounters": "whisperwood",
-                                           "nameKey": "mapWhisperwood", "props": "whisperwood",
-                                           "backdrop": "whisperwood"}, seed=9, tileset=ts)
-    path = clean(stroke([(-1, 14.5), (10.5, 14.5), (10.5, 9.5), (22.5, 9.5), (22.5, 17.5), (34.5, 17.5), (34.5, 12.5),
-                         (49, 12.5)], 1.45, W, H), W, H)
+WHISPERWOOD_PROPS = {"bgm": "whisperwood", "encounters": "whisperwood", "nameKey": "mapWhisperwood",
+                     "props": "whisperwood", "backdrop": "whisperwood"}
+
+
+def forest_ground(m, meta, path, clearings):
+    """Grass tones + decor, the autotiled path, sunnier clearings.
+    Returns (on_path, in_clearing) for prop placement."""
+    W, H = m.w, m.h
     on_path = clamped(path, W, H)
-    clearings = [(15, 19, 22, 25), (37, 2, 44, 8)]
 
     def in_clearing(x, y, pad=0):
         return any(x0 - pad <= x <= x1 + pad and y0 - pad <= y <= y1 + pad for x0, y0, x1, y1 in clearings)
@@ -272,18 +279,16 @@ def whisperwood_1():
             if m.r.random() < (0.4 if sunny else 0.28):
                 m.set("decor", x, y, m.r.choices(decor, [8, 5, 3, 2 if sunny else 1.4, 1.5 if sunny else 1,
                                                          1.5 if sunny else 1, 2, 1.5, 0.6, 1.5, 1, 0.8])[0])
+    return on_path, in_clearing
 
-    m.obj("spawn", "west", 1, 14)
-    m.obj("chest", "chest_a", 18, 22, 1, 1, item="herbal", count=2)
-    m.obj("chest", "chest_b", 40, 5, 1, 1, item="tonik", count=1)
-    m.obj("chest", "chest_c", 29, 20, 1, 1, item="bulu_bara", count=1)
-    m.obj("sign", "sign_post", 45, 10, 1, 1, dialog="Sign_Post")
-    m.obj("exit", "to_hollowmere", 0, 12, 1, 4, map="hollowmere", spawn="east")
-    m.obj("exit", "to_post", 47, 11, 1, 4, blockedDialog="Path_Closed")
-    m.prop("signpost", 45.5 * T, 11 * T - 1)
 
-    # Keep-out zones in px: objects need room to be reached.
+def forest_props(m, on_path, in_clearing, blight, placed=()):
+    """Undergrowth, Ashblight (`blight(x_fraction)` = chance per try) and
+    trees, kept off the path and clearings, clear of every object, and no
+    canopy over a chest or sign. `placed` are (x, y, spacing) already taken."""
+    W, H = m.w, m.h
     keep_out = [(x + max(w, T) / 2, y + max(h, T) / 2, 30) for _, _, x, y, w, h, _ in m.objects]
+    placed = list(placed)
 
     def blocked(px, py, trunk=10):
         tx, ty = int(px // T), int(py // T)
@@ -292,8 +297,6 @@ def whisperwood_1():
         if in_clearing(tx, ty, pad=0):
             return True
         return any(math.hypot(px - cx, py - cy) < r + trunk for cx, cy, r in keep_out)
-
-    placed = [(45.5 * T, 11 * T, 10)]
 
     def hides_object(px, py):
         """A tree whose canopy would cover a chest or sign."""
@@ -319,18 +322,77 @@ def whisperwood_1():
                 n -= 1
                 if n == 0:
                     break
-    for _ in range(400):  # blight thickens toward the east (the mine)
+    for _ in range(400):
         x = m.r.uniform(0, W * T)
-        if m.r.random() < (x / (W * T)) ** 2 * 0.5:
+        if m.r.random() < blight(x / (W * T)):
             try_place("ashblight", x, m.r.uniform(0, H * T), 20)
     for _ in range(1600):
         try_place(m.r.choices(["big_tree", "big_tree_b", "pine", "small_tree"], [3, 3, 3, 2])[0],
                   m.r.uniform(0, W * T), m.r.uniform(0, H * T + 24), 32)
+
+
+def canopy_light(m, clearings, gaps):
+    """Light shafts over each clearing and at a few gaps (tile coords)."""
+    for x0, y0, x1, y1 in clearings:
+        m.light("shaft", (x0 + 1) * T, (y0 - 3) * T, (x1 - x0 - 2) * T * 0.6, (y1 - y0 + 3) * T)
+    for tx, ty in gaps:
+        m.light("shaft", tx * T, ty * T, 28, 72)
+
+
+def whisperwood_1():
+    """Forest path west → east with two clearings. Final art: the path is a
+    3-wide autotiled trail, trees and rocks are y-sorted props."""
+    W, H = 48, 28
+    ts, meta = area_tileset("whisperwood")
+    m = MapBuilder("whisperwood_1", W, H, {**WHISPERWOOD_PROPS, "ambient": "#B8CCC8"}, seed=9, tileset=ts)
+    path = clean(stroke([(-1, 14.5), (10.5, 14.5), (10.5, 9.5), (22.5, 9.5), (22.5, 17.5), (34.5, 17.5), (34.5, 12.5),
+                         (49, 12.5)], 1.45, W, H), W, H)
+    clearings = [(15, 19, 22, 25), (37, 2, 44, 8)]
+    on_path, in_clearing = forest_ground(m, meta, path, clearings)
+
+    m.obj("spawn", "west", 1, 14)
+    m.obj("spawn", "east", 44.5, 12.8)
+    m.obj("chest", "chest_a", 18, 22, 1, 1, item="herbal", count=2)
+    m.obj("chest", "chest_b", 40, 5, 1, 1, item="tonik", count=1)
+    m.obj("chest", "chest_c", 29, 20, 1, 1, item="bulu_bara", count=1)
+    m.obj("sign", "sign_post", 45, 10, 1, 1, dialog="Sign_Post")
+    m.obj("exit", "to_hollowmere", 0, 12, 1, 4, map="hollowmere", spawn="east")
+    m.obj("exit", "to_whisperwood_2", 47, 11, 1, 4, map="whisperwood_2", spawn="west")
+    m.prop("signpost", 45.5 * T, 11 * T - 1)
+
+    # blight thickens toward the east (the mine)
+    forest_props(m, on_path, in_clearing, lambda f: f ** 2 * 0.5, placed=[(45.5 * T, 11 * T, 10)])
+    canopy_light(m, clearings, ((5, 11), (16, 6), (28, 14), (41, 9)))
     m.write("../../assets/maps/whisperwood_1.tmx")
+
+
+def whisperwood_2():
+    """Deeper forest toward the Post: darker, thick Ashblight, a hunter's camp.
+    The hunter answers Lira's "Tanya" with the way to a hidden chest."""
+    W, H = 48, 28
+    ts, meta = area_tileset("whisperwood")
+    m = MapBuilder("whisperwood_2", W, H, {**WHISPERWOOD_PROPS, "ambient": "#AABFBB"}, seed=21, tileset=ts)
+    path = clean(stroke([(-1, 12.5), (8.5, 12.5), (8.5, 20.5), (24.5, 20.5), (24.5, 8.5), (40.5, 8.5), (40.5, 14.5),
+                         (49, 14.5)], 1.45, W, H), W, H)
+    clearings = [(28, 11, 35, 17), (12, 2, 18, 6), (30, 22, 36, 25)]
+    on_path, in_clearing = forest_ground(m, meta, path, clearings)
+
+    m.obj("spawn", "west", 2, 13)
+    m.obj("spawn", "east", 45, 15)
+    m.obj("npc", "hunter", 31.5, 14.5, dialog="Hunter", sheet="kael_sheet.png", tint="#A08A62", facing="left")
+    m.obj("chest", "chest_d", 33, 23, 1, 1, item="penawar", count=2)
+    m.obj("chest", "chest_secret", 15, 3, 1, 1, item="bulu_bara", count=2, requiresFlag="ww_secret")
+    m.obj("exit", "to_whisperwood_1", 0, 11, 1, 4, map="whisperwood_1", spawn="east")
+    m.obj("exit", "to_post", 47, 13, 1, 4, blockedDialog="Path_Closed")
+
+    forest_props(m, on_path, in_clearing, lambda f: 0.1 + f * 0.25)
+    canopy_light(m, clearings, ((4, 9), (19, 17), (36, 5), (44, 11)))
+    m.write("../../assets/maps/whisperwood_2.tmx")
 
 
 if __name__ == "__main__":
     tiles.build("../../assets/maps/placeholder_tiles.png")
     hollowmere()
     whisperwood_1()
+    whisperwood_2()
     print("maps written")

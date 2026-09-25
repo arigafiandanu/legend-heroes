@@ -23,7 +23,7 @@ class GameData {
   });
 
   /// Maps shipped in assets/maps/ (Tiled .tmx).
-  static const mapIds = ['hollowmere', 'whisperwood_1'];
+  static const mapIds = ['hollowmere', 'whisperwood_1', 'whisperwood_2'];
 
   factory GameData.fromJsonStrings({
     required String characters,

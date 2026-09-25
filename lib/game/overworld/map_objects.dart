@@ -53,11 +53,17 @@ class Npc extends CharacterSprite implements Interactable {
 
 /// Treasure chest: `props/chest.png` (closed, open), 16×16 frames.
 class Chest extends PositionComponent with HasGameReference implements Interactable {
-  Chest({required Rect rect, required this.opened, required this.onOpen})
+  Chest({required Rect rect, required this.opened, required this.onOpen, this.revealed})
       : super(position: Vector2(rect.left, rect.top), size: Vector2(rect.width, rect.height));
 
   bool opened;
   final Future<void> Function(Chest chest) onOpen;
+
+  /// For hidden chests: whether it has been found yet (e.g. a dialog flag).
+  /// A hidden chest is not drawn, does not block and cannot be opened.
+  final bool Function()? revealed;
+
+  bool get shown => revealed?.call() ?? true;
 
   static final _shadow = Paint()..color = const Color(0x55000000);
   late final Sprite _closed, _open;
@@ -77,6 +83,7 @@ class Chest extends PositionComponent with HasGameReference implements Interacta
 
   @override
   void render(Canvas canvas) {
+    if (!shown) return;
     canvas.drawOval(Rect.fromLTWH(1, size.y - 3, size.x - 1, 4), _shadow);
     (opened ? _open : _closed).render(canvas, position: Vector2(size.x / 2 - 8, size.y - 16), overridePaint: _pixel);
   }

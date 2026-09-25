@@ -62,6 +62,18 @@ void main() {
         }
       });
 
+      test('hidden chests open with a flag some dialog sets', () {
+        final setFlags = {
+          for (final lang in ['id', 'en'])
+            for (final f in DialogFiles.files)
+              for (final m in RegExp(r'<<flag (\w+)>>').allMatches(read('assets/dialog/$lang/$f'))) m.group(1)!,
+        };
+        for (final o in objects(m).where((o) => o.type == 'chest')) {
+          final flag = o.properties.getValue<String>('requiresFlag');
+          if (flag != null) expect(setFlags, contains(flag), reason: '${o.name} needs $flag');
+        }
+      });
+
       test('chests hold known items', () {
         for (final o in objects(m).where((o) => o.type == 'chest')) {
           expect(gameData.items.containsKey(o.properties.getValue<String>('item')), isTrue, reason: o.name);

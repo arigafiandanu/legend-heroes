@@ -6,3 +6,19 @@ title: Path_Closed
 ---
 Lira: Jalannya tertutup pohon tumbang. Kita harus mencari jalan lain nanti.
 ===
+title: Hunter
+---
+<<if has_flag("ww_secret")>>
+    Pemburu: Peti itu ada di tanah lapang kecil di utara, di balik semak-semak. Ambil saja, aku tak perlu.
+<<else>>
+    Pemburu: Kalian dari Hollowmere? Hati-hati, Ashblight makin tebal ke arah timur.
+    Pemburu: Serigala lumut juga berkeliaran. Serang dengan tombak, bulu lumutnya tak tahan api.
+    -> \[Tanya\] Sudah lama berburu di hutan ini?
+        Pemburu: Dua puluh musim. Dulu hutan ini aman... sampai bara di timur mulai padam.
+        Pemburu: Hmm, kau anak yang sopan. Akan kuberi tahu satu rahasia.
+        Pemburu: Ada peti tua di tanah lapang kecil di utara. Pedagang yang lewat dulu menyembunyikannya di sana.
+        Lira: Terima kasih! Kami akan mencarinya.
+        <<flag ww_secret>>
+    -> Pergi
+<<endif>>
+===

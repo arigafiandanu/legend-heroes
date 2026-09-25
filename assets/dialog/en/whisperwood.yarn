@@ -6,3 +6,19 @@ title: Path_Closed
 ---
 Lira: Fallen trees block the path. We'll have to find another way later.
 ===
+title: Hunter
+---
+<<if has_flag("ww_secret")>>
+    Hunter: That chest is in the small clearing up north, behind the bushes. Take it, I've no use for it.
+<<else>>
+    Hunter: From Hollowmere? Careful, the Ashblight grows thicker to the east.
+    Hunter: Moss wolves roam here too. Go at them with a spear, and fire; that moss of theirs burns.
+    -> \[Ask\] Have you hunted in this forest long?
+        Hunter: Twenty seasons. It used to be safe... until the ember in the east began to fade.
+        Hunter: Hm, you're a polite one. I'll tell you a secret.
+        Hunter: There's an old chest in the small clearing up north. A passing merchant hid it there long ago.
+        Lira: Thank you! We'll go and find it.
+        <<flag ww_secret>>
+    -> Leave
+<<endif>>
+===

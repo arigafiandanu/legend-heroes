@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="48" height="28" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="562">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="48" height="28" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="563">
  <properties>
   <property name="bgm" value="whisperwood"/>
   <property name="encounters" value="whisperwood"/>
   <property name="nameKey" value="mapWhisperwood"/>
   <property name="props" value="whisperwood"/>
   <property name="backdrop" value="whisperwood"/>
+  <property name="ambient" value="#B8CCC8"/>
  </properties>
  <tileset firstgid="1" name="whisperwood" tilewidth="16" tileheight="16" tilecount="37" columns="8">
   <image source="whisperwood_tiles.png" width="128" height="80"/>
@@ -116,506 +117,518 @@
   <object id="5" name="west" class="spawn" x="16" y="224">
    <point/>
   </object>
-  <object id="6" name="chest_a" class="chest" x="288" y="352" width="16" height="16">
+  <object id="6" name="east" class="spawn" x="712.0" y="204.8">
+   <point/>
+  </object>
+  <object id="7" name="chest_a" class="chest" x="288" y="352" width="16" height="16">
    <properties>
     <property name="item" value="herbal"/>
     <property name="count" type="int" value="2"/>
    </properties>
   </object>
-  <object id="7" name="chest_b" class="chest" x="640" y="80" width="16" height="16">
+  <object id="8" name="chest_b" class="chest" x="640" y="80" width="16" height="16">
    <properties>
     <property name="item" value="tonik"/>
     <property name="count" type="int" value="1"/>
    </properties>
   </object>
-  <object id="8" name="chest_c" class="chest" x="464" y="320" width="16" height="16">
+  <object id="9" name="chest_c" class="chest" x="464" y="320" width="16" height="16">
    <properties>
     <property name="item" value="bulu_bara"/>
     <property name="count" type="int" value="1"/>
    </properties>
   </object>
-  <object id="9" name="sign_post" class="sign" x="720" y="160" width="16" height="16">
+  <object id="10" name="sign_post" class="sign" x="720" y="160" width="16" height="16">
    <properties>
     <property name="dialog" value="Sign_Post"/>
    </properties>
   </object>
-  <object id="10" name="to_hollowmere" class="exit" x="0" y="192" width="16" height="64">
+  <object id="11" name="to_hollowmere" class="exit" x="0" y="192" width="16" height="64">
    <properties>
     <property name="map" value="hollowmere"/>
     <property name="spawn" value="east"/>
    </properties>
   </object>
-  <object id="11" name="to_post" class="exit" x="752" y="176" width="16" height="64">
+  <object id="12" name="to_whisperwood_2" class="exit" x="752" y="176" width="16" height="64">
    <properties>
-    <property name="blockedDialog" value="Path_Closed"/>
+    <property name="map" value="whisperwood_2"/>
+    <property name="spawn" value="west"/>
    </properties>
   </object>
  </objectgroup>
  <objectgroup id="6" name="props">
-  <object id="12" name="big_tree" class="prop" x="98" y="22">
+  <object id="13" name="big_tree" class="prop" x="98" y="22">
    <point/>
   </object>
-  <object id="13" name="pine" class="prop" x="324" y="22">
+  <object id="14" name="pine" class="prop" x="324" y="22">
    <point/>
   </object>
-  <object id="14" name="bush" class="prop" x="546" y="24">
+  <object id="15" name="bush" class="prop" x="546" y="24">
    <point/>
   </object>
-  <object id="15" name="ashblight" class="prop" x="678" y="25">
+  <object id="16" name="ashblight" class="prop" x="678" y="25">
    <point/>
   </object>
-  <object id="16" name="big_tree_b" class="prop" x="184" y="27">
+  <object id="17" name="big_tree_b" class="prop" x="184" y="27">
    <point/>
   </object>
-  <object id="17" name="big_tree" class="prop" x="18" y="28">
+  <object id="18" name="big_tree" class="prop" x="18" y="28">
    <point/>
   </object>
-  <object id="18" name="pine" class="prop" x="65" y="29">
+  <object id="19" name="pine" class="prop" x="65" y="29">
    <point/>
   </object>
-  <object id="19" name="log" class="prop" x="147" y="29">
+  <object id="20" name="log" class="prop" x="147" y="29">
    <point/>
   </object>
-  <object id="20" name="big_tree" class="prop" x="630" y="29">
+  <object id="21" name="big_tree" class="prop" x="630" y="29">
    <point/>
   </object>
-  <object id="21" name="small_tree" class="prop" x="223" y="31">
+  <object id="22" name="small_tree" class="prop" x="223" y="31">
    <point/>
   </object>
-  <object id="22" name="ashblight" class="prop" x="733" y="31">
+  <object id="23" name="ashblight" class="prop" x="733" y="31">
    <point/>
   </object>
-  <object id="23" name="pine" class="prop" x="509" y="33">
+  <object id="24" name="pine" class="prop" x="509" y="33">
    <point/>
   </object>
-  <object id="24" name="ashblight" class="prop" x="442" y="35">
+  <object id="25" name="ashblight" class="prop" x="442" y="35">
    <point/>
   </object>
-  <object id="25" name="ashblight" class="prop" x="381" y="37">
+  <object id="26" name="ashblight" class="prop" x="381" y="37">
    <point/>
   </object>
-  <object id="26" name="big_tree_b" class="prop" x="260" y="47">
+  <object id="27" name="big_tree_b" class="prop" x="260" y="47">
    <point/>
   </object>
-  <object id="27" name="small_tree" class="prop" x="298" y="47">
+  <object id="28" name="small_tree" class="prop" x="298" y="47">
    <point/>
   </object>
-  <object id="28" name="big_tree" class="prop" x="122" y="52">
+  <object id="29" name="big_tree" class="prop" x="122" y="52">
    <point/>
   </object>
-  <object id="29" name="big_tree_b" class="prop" x="346" y="53">
+  <object id="30" name="big_tree_b" class="prop" x="346" y="53">
    <point/>
   </object>
-  <object id="30" name="big_tree_b" class="prop" x="564" y="63">
+  <object id="31" name="big_tree_b" class="prop" x="564" y="63">
    <point/>
   </object>
-  <object id="31" name="ashblight" class="prop" x="731" y="63">
+  <object id="32" name="ashblight" class="prop" x="731" y="63">
    <point/>
   </object>
-  <object id="32" name="pine" class="prop" x="27" y="64">
+  <object id="33" name="pine" class="prop" x="27" y="64">
    <point/>
   </object>
-  <object id="33" name="rock" class="prop" x="377" y="65">
+  <object id="34" name="rock" class="prop" x="377" y="65">
    <point/>
   </object>
-  <object id="34" name="big_tree_b" class="prop" x="490" y="65">
+  <object id="35" name="big_tree_b" class="prop" x="490" y="65">
    <point/>
   </object>
-  <object id="35" name="pine" class="prop" x="211" y="72">
+  <object id="36" name="pine" class="prop" x="211" y="72">
    <point/>
   </object>
-  <object id="36" name="stump" class="prop" x="420" y="77">
+  <object id="37" name="stump" class="prop" x="420" y="77">
    <point/>
   </object>
-  <object id="37" name="ashblight" class="prop" x="748" y="78">
+  <object id="38" name="ashblight" class="prop" x="748" y="78">
    <point/>
   </object>
-  <object id="38" name="log" class="prop" x="322" y="84">
+  <object id="39" name="log" class="prop" x="322" y="84">
    <point/>
   </object>
-  <object id="39" name="big_tree_b" class="prop" x="176" y="86">
+  <object id="40" name="big_tree_b" class="prop" x="176" y="86">
    <point/>
   </object>
-  <object id="40" name="ashblight" class="prop" x="444" y="86">
+  <object id="41" name="ashblight" class="prop" x="444" y="86">
    <point/>
   </object>
-  <object id="41" name="big_tree_b" class="prop" x="530" y="86">
+  <object id="42" name="big_tree_b" class="prop" x="530" y="86">
    <point/>
   </object>
-  <object id="42" name="small_tree" class="prop" x="89" y="92">
+  <object id="43" name="small_tree" class="prop" x="89" y="92">
    <point/>
   </object>
-  <object id="43" name="stump" class="prop" x="582" y="93">
+  <object id="44" name="stump" class="prop" x="582" y="93">
    <point/>
   </object>
-  <object id="44" name="big_tree_b" class="prop" x="275" y="96">
+  <object id="45" name="big_tree_b" class="prop" x="275" y="96">
    <point/>
   </object>
-  <object id="45" name="big_tree" class="prop" x="231" y="99">
+  <object id="46" name="big_tree" class="prop" x="231" y="99">
    <point/>
   </object>
-  <object id="46" name="ashblight" class="prop" x="393" y="99">
+  <object id="47" name="ashblight" class="prop" x="393" y="99">
    <point/>
   </object>
-  <object id="47" name="bush" class="prop" x="481" y="102">
+  <object id="48" name="bush" class="prop" x="481" y="102">
    <point/>
   </object>
-  <object id="48" name="small_tree" class="prop" x="39" y="107">
+  <object id="49" name="small_tree" class="prop" x="39" y="107">
    <point/>
   </object>
-  <object id="49" name="rock_small" class="prop" x="372" y="108">
+  <object id="50" name="rock_small" class="prop" x="372" y="108">
    <point/>
   </object>
-  <object id="50" name="ashblight" class="prop" x="563" y="109">
+  <object id="51" name="ashblight" class="prop" x="563" y="109">
    <point/>
   </object>
-  <object id="51" name="big_tree" class="prop" x="135" y="116">
+  <object id="52" name="big_tree" class="prop" x="135" y="116">
    <point/>
   </object>
-  <object id="52" name="rock" class="prop" x="501" y="116">
+  <object id="53" name="rock" class="prop" x="501" y="116">
    <point/>
   </object>
-  <object id="53" name="pine" class="prop" x="302" y="117">
+  <object id="54" name="pine" class="prop" x="302" y="117">
    <point/>
   </object>
-  <object id="54" name="ashblight" class="prop" x="532" y="120">
+  <object id="55" name="ashblight" class="prop" x="532" y="120">
    <point/>
   </object>
-  <object id="55" name="big_tree_b" class="prop" x="445" y="122">
+  <object id="56" name="big_tree_b" class="prop" x="445" y="122">
    <point/>
   </object>
-  <object id="56" name="rock" class="prop" x="209" y="123">
+  <object id="57" name="rock" class="prop" x="209" y="123">
    <point/>
   </object>
-  <object id="57" name="rock" class="prop" x="743" y="124">
+  <object id="58" name="rock" class="prop" x="743" y="124">
    <point/>
   </object>
-  <object id="58" name="big_tree_b" class="prop" x="249" y="126">
+  <object id="59" name="big_tree_b" class="prop" x="249" y="126">
    <point/>
   </object>
-  <object id="59" name="big_tree" class="prop" x="591" y="127">
+  <object id="60" name="big_tree" class="prop" x="591" y="127">
    <point/>
   </object>
-  <object id="60" name="pine" class="prop" x="80" y="139">
+  <object id="61" name="pine" class="prop" x="80" y="139">
    <point/>
   </object>
-  <object id="61" name="small_tree" class="prop" x="9" y="143">
+  <object id="62" name="small_tree" class="prop" x="9" y="143">
    <point/>
   </object>
-  <object id="62" name="pine" class="prop" x="422" y="145">
+  <object id="63" name="pine" class="prop" x="422" y="145">
    <point/>
   </object>
-  <object id="63" name="big_tree_b" class="prop" x="686" y="146">
+  <object id="64" name="big_tree_b" class="prop" x="686" y="146">
    <point/>
   </object>
-  <object id="64" name="big_tree" class="prop" x="46" y="151">
+  <object id="65" name="big_tree" class="prop" x="46" y="151">
    <point/>
   </object>
-  <object id="65" name="ashblight" class="prop" x="564" y="151">
+  <object id="66" name="ashblight" class="prop" x="564" y="151">
    <point/>
   </object>
-  <object id="66" name="big_tree" class="prop" x="127" y="157">
+  <object id="67" name="big_tree" class="prop" x="127" y="157">
    <point/>
   </object>
-  <object id="67" name="big_tree_b" class="prop" x="526" y="161">
+  <object id="68" name="big_tree_b" class="prop" x="526" y="161">
    <point/>
   </object>
-  <object id="68" name="small_tree" class="prop" x="600" y="166">
+  <object id="69" name="small_tree" class="prop" x="600" y="166">
    <point/>
   </object>
-  <object id="69" name="rock_small" class="prop" x="477" y="169">
+  <object id="70" name="rock_small" class="prop" x="477" y="169">
    <point/>
   </object>
-  <object id="70" name="ashblight" class="prop" x="644" y="172">
+  <object id="71" name="ashblight" class="prop" x="644" y="172">
    <point/>
   </object>
-  <object id="71" name="signpost" class="prop" x="728" y="175">
+  <object id="72" name="signpost" class="prop" x="728" y="175">
    <point/>
   </object>
-  <object id="72" name="big_tree" class="prop" x="10" y="180">
+  <object id="73" name="big_tree" class="prop" x="10" y="180">
    <point/>
   </object>
-  <object id="73" name="bush" class="prop" x="437" y="184">
+  <object id="74" name="bush" class="prop" x="437" y="184">
    <point/>
   </object>
-  <object id="74" name="big_tree_b" class="prop" x="506" y="187">
+  <object id="75" name="big_tree_b" class="prop" x="506" y="187">
    <point/>
   </object>
-  <object id="75" name="bush" class="prop" x="46" y="189">
+  <object id="76" name="bush" class="prop" x="46" y="189">
    <point/>
   </object>
-  <object id="76" name="big_tree" class="prop" x="86" y="192">
+  <object id="77" name="big_tree" class="prop" x="86" y="192">
    <point/>
   </object>
-  <object id="77" name="small_tree" class="prop" x="229" y="201">
+  <object id="78" name="small_tree" class="prop" x="229" y="201">
    <point/>
   </object>
-  <object id="78" name="ashblight" class="prop" x="464" y="201">
+  <object id="79" name="ashblight" class="prop" x="464" y="201">
    <point/>
   </object>
-  <object id="79" name="small_tree" class="prop" x="124" y="205">
+  <object id="80" name="small_tree" class="prop" x="124" y="205">
    <point/>
   </object>
-  <object id="80" name="big_tree" class="prop" x="294" y="210">
+  <object id="81" name="big_tree" class="prop" x="294" y="210">
    <point/>
   </object>
-  <object id="81" name="pine" class="prop" x="436" y="220">
+  <object id="82" name="pine" class="prop" x="436" y="220">
    <point/>
   </object>
-  <object id="82" name="ashblight" class="prop" x="400" y="221">
+  <object id="83" name="ashblight" class="prop" x="400" y="221">
    <point/>
   </object>
-  <object id="83" name="big_tree" class="prop" x="248" y="228">
+  <object id="84" name="big_tree" class="prop" x="248" y="228">
    <point/>
   </object>
-  <object id="84" name="big_tree" class="prop" x="508" y="229">
+  <object id="85" name="big_tree" class="prop" x="508" y="229">
    <point/>
   </object>
-  <object id="85" name="pine" class="prop" x="305" y="246">
+  <object id="86" name="pine" class="prop" x="305" y="246">
    <point/>
   </object>
-  <object id="86" name="big_tree" class="prop" x="484" y="251">
+  <object id="87" name="big_tree" class="prop" x="484" y="251">
    <point/>
   </object>
-  <object id="87" name="ashblight" class="prop" x="651" y="253">
+  <object id="88" name="ashblight" class="prop" x="651" y="253">
    <point/>
   </object>
-  <object id="88" name="rock" class="prop" x="442" y="255">
+  <object id="89" name="rock" class="prop" x="442" y="255">
    <point/>
   </object>
-  <object id="89" name="pine" class="prop" x="408" y="256">
+  <object id="90" name="pine" class="prop" x="408" y="256">
    <point/>
   </object>
-  <object id="90" name="ashblight" class="prop" x="633" y="263">
+  <object id="91" name="ashblight" class="prop" x="633" y="263">
    <point/>
   </object>
-  <object id="91" name="ashblight" class="prop" x="700" y="263">
+  <object id="92" name="ashblight" class="prop" x="700" y="263">
    <point/>
   </object>
-  <object id="92" name="pine" class="prop" x="208" y="267">
+  <object id="93" name="pine" class="prop" x="208" y="267">
    <point/>
   </object>
-  <object id="93" name="pine" class="prop" x="159" y="275">
+  <object id="94" name="pine" class="prop" x="159" y="275">
    <point/>
   </object>
-  <object id="94" name="ashblight" class="prop" x="281" y="276">
+  <object id="95" name="ashblight" class="prop" x="281" y="276">
    <point/>
   </object>
-  <object id="95" name="small_tree" class="prop" x="112" y="279">
+  <object id="96" name="small_tree" class="prop" x="112" y="279">
    <point/>
   </object>
-  <object id="96" name="ashblight" class="prop" x="592" y="281">
+  <object id="97" name="ashblight" class="prop" x="592" y="281">
    <point/>
   </object>
-  <object id="97" name="ashblight" class="prop" x="690" y="283">
+  <object id="98" name="ashblight" class="prop" x="690" y="283">
    <point/>
   </object>
-  <object id="98" name="rock" class="prop" x="245" y="284">
+  <object id="99" name="rock" class="prop" x="245" y="284">
    <point/>
   </object>
-  <object id="99" name="rock_small" class="prop" x="663" y="289">
+  <object id="100" name="rock_small" class="prop" x="663" y="289">
    <point/>
   </object>
-  <object id="100" name="bush" class="prop" x="32" y="291">
+  <object id="101" name="bush" class="prop" x="32" y="291">
    <point/>
   </object>
-  <object id="101" name="big_tree" class="prop" x="318" y="297">
+  <object id="102" name="big_tree" class="prop" x="318" y="297">
    <point/>
   </object>
-  <object id="102" name="pine" class="prop" x="732" y="304">
+  <object id="103" name="pine" class="prop" x="732" y="304">
    <point/>
   </object>
-  <object id="103" name="rock_small" class="prop" x="233" y="311">
+  <object id="104" name="rock_small" class="prop" x="233" y="311">
    <point/>
   </object>
-  <object id="104" name="rock_small" class="prop" x="665" y="311">
+  <object id="105" name="rock_small" class="prop" x="665" y="311">
    <point/>
   </object>
-  <object id="105" name="ashblight" class="prop" x="632" y="317">
+  <object id="106" name="ashblight" class="prop" x="632" y="317">
    <point/>
   </object>
-  <object id="106" name="pine" class="prop" x="191" y="320">
+  <object id="107" name="pine" class="prop" x="191" y="320">
    <point/>
   </object>
-  <object id="107" name="big_tree_b" class="prop" x="71" y="322">
+  <object id="108" name="big_tree_b" class="prop" x="71" y="322">
    <point/>
   </object>
-  <object id="108" name="small_tree" class="prop" x="158" y="323">
+  <object id="109" name="small_tree" class="prop" x="158" y="323">
    <point/>
   </object>
-  <object id="109" name="big_tree" class="prop" x="391" y="323">
+  <object id="110" name="big_tree" class="prop" x="391" y="323">
    <point/>
   </object>
-  <object id="110" name="big_tree_b" class="prop" x="113" y="324">
+  <object id="111" name="big_tree_b" class="prop" x="113" y="324">
    <point/>
   </object>
-  <object id="111" name="ashblight" class="prop" x="658" y="330">
+  <object id="112" name="ashblight" class="prop" x="658" y="330">
    <point/>
   </object>
-  <object id="112" name="bush" class="prop" x="547" y="333">
+  <object id="113" name="bush" class="prop" x="547" y="333">
    <point/>
   </object>
-  <object id="113" name="rock_small" class="prop" x="759" y="339">
+  <object id="114" name="rock_small" class="prop" x="759" y="339">
    <point/>
   </object>
-  <object id="114" name="big_tree_b" class="prop" x="44" y="341">
+  <object id="115" name="big_tree_b" class="prop" x="44" y="341">
    <point/>
   </object>
-  <object id="115" name="ashblight" class="prop" x="583" y="343">
+  <object id="116" name="ashblight" class="prop" x="583" y="343">
    <point/>
   </object>
-  <object id="116" name="log" class="prop" x="720" y="343">
+  <object id="117" name="log" class="prop" x="720" y="343">
    <point/>
   </object>
-  <object id="117" name="ashblight" class="prop" x="623" y="348">
+  <object id="118" name="ashblight" class="prop" x="623" y="348">
    <point/>
   </object>
-  <object id="118" name="big_tree_b" class="prop" x="412" y="352">
+  <object id="119" name="big_tree_b" class="prop" x="412" y="352">
    <point/>
   </object>
-  <object id="119" name="small_tree" class="prop" x="523" y="355">
+  <object id="120" name="small_tree" class="prop" x="523" y="355">
    <point/>
   </object>
-  <object id="120" name="stump" class="prop" x="99" y="356">
+  <object id="121" name="stump" class="prop" x="99" y="356">
    <point/>
   </object>
-  <object id="121" name="big_tree" class="prop" x="232" y="358">
+  <object id="122" name="big_tree" class="prop" x="232" y="358">
    <point/>
   </object>
-  <object id="122" name="ashblight" class="prop" x="681" y="362">
+  <object id="123" name="ashblight" class="prop" x="681" y="362">
    <point/>
   </object>
-  <object id="123" name="ashblight" class="prop" x="573" y="363">
+  <object id="124" name="ashblight" class="prop" x="573" y="363">
    <point/>
   </object>
-  <object id="124" name="big_tree_b" class="prop" x="168" y="365">
+  <object id="125" name="big_tree_b" class="prop" x="168" y="365">
    <point/>
   </object>
-  <object id="125" name="big_tree" class="prop" x="132" y="372">
+  <object id="126" name="big_tree" class="prop" x="132" y="372">
    <point/>
   </object>
-  <object id="126" name="ashblight" class="prop" x="386" y="379">
+  <object id="127" name="ashblight" class="prop" x="386" y="379">
    <point/>
   </object>
-  <object id="127" name="ashblight" class="prop" x="650" y="381">
+  <object id="128" name="ashblight" class="prop" x="650" y="381">
    <point/>
   </object>
-  <object id="128" name="rock_small" class="prop" x="705" y="385">
+  <object id="129" name="rock_small" class="prop" x="705" y="385">
    <point/>
   </object>
-  <object id="129" name="pine" class="prop" x="83" y="387">
+  <object id="130" name="pine" class="prop" x="83" y="387">
    <point/>
   </object>
-  <object id="130" name="big_tree_b" class="prop" x="599" y="390">
+  <object id="131" name="big_tree_b" class="prop" x="599" y="390">
    <point/>
   </object>
-  <object id="131" name="small_tree" class="prop" x="744" y="392">
+  <object id="132" name="small_tree" class="prop" x="744" y="392">
    <point/>
   </object>
-  <object id="132" name="big_tree_b" class="prop" x="525" y="396">
+  <object id="133" name="big_tree_b" class="prop" x="525" y="396">
    <point/>
   </object>
-  <object id="133" name="pine" class="prop" x="185" y="398">
+  <object id="134" name="pine" class="prop" x="185" y="398">
    <point/>
   </object>
-  <object id="134" name="big_tree" class="prop" x="427" y="399">
+  <object id="135" name="big_tree" class="prop" x="427" y="399">
    <point/>
   </object>
-  <object id="135" name="big_tree_b" class="prop" x="564" y="399">
+  <object id="136" name="big_tree_b" class="prop" x="564" y="399">
    <point/>
   </object>
-  <object id="136" name="stump" class="prop" x="33" y="403">
+  <object id="137" name="stump" class="prop" x="33" y="403">
    <point/>
   </object>
-  <object id="137" name="pine" class="prop" x="475" y="411">
+  <object id="138" name="pine" class="prop" x="475" y="411">
    <point/>
   </object>
-  <object id="138" name="rock_small" class="prop" x="630" y="413">
+  <object id="139" name="rock_small" class="prop" x="630" y="413">
    <point/>
   </object>
-  <object id="139" name="bush" class="prop" x="141" y="418">
+  <object id="140" name="bush" class="prop" x="141" y="418">
    <point/>
   </object>
-  <object id="140" name="stump" class="prop" x="329" y="420">
+  <object id="141" name="stump" class="prop" x="329" y="420">
    <point/>
   </object>
-  <object id="141" name="bush" class="prop" x="101" y="421">
+  <object id="142" name="bush" class="prop" x="101" y="421">
    <point/>
   </object>
-  <object id="142" name="bush" class="prop" x="222" y="421">
+  <object id="143" name="bush" class="prop" x="222" y="421">
    <point/>
   </object>
-  <object id="143" name="big_tree" class="prop" x="756" y="426">
+  <object id="144" name="big_tree" class="prop" x="756" y="426">
    <point/>
   </object>
-  <object id="144" name="bush" class="prop" x="680" y="427">
+  <object id="145" name="bush" class="prop" x="680" y="427">
    <point/>
   </object>
-  <object id="145" name="bush" class="prop" x="440" y="433">
+  <object id="146" name="bush" class="prop" x="440" y="433">
    <point/>
   </object>
-  <object id="146" name="big_tree" class="prop" x="13" y="434">
+  <object id="147" name="big_tree" class="prop" x="13" y="434">
    <point/>
   </object>
-  <object id="147" name="bush" class="prop" x="364" y="435">
+  <object id="148" name="bush" class="prop" x="364" y="435">
    <point/>
   </object>
-  <object id="148" name="ashblight" class="prop" x="579" y="436">
+  <object id="149" name="ashblight" class="prop" x="579" y="436">
    <point/>
   </object>
-  <object id="149" name="ashblight" class="prop" x="498" y="437">
+  <object id="150" name="ashblight" class="prop" x="498" y="437">
    <point/>
   </object>
-  <object id="150" name="pine" class="prop" x="50" y="443">
+  <object id="151" name="pine" class="prop" x="50" y="443">
    <point/>
   </object>
-  <object id="151" name="bush" class="prop" x="267" y="443">
+  <object id="152" name="bush" class="prop" x="267" y="443">
    <point/>
   </object>
-  <object id="152" name="pine" class="prop" x="406" y="443">
+  <object id="153" name="pine" class="prop" x="406" y="443">
    <point/>
   </object>
-  <object id="153" name="pine" class="prop" x="535" y="443">
+  <object id="154" name="pine" class="prop" x="535" y="443">
    <point/>
   </object>
-  <object id="154" name="ashblight" class="prop" x="602" y="443">
+  <object id="155" name="ashblight" class="prop" x="602" y="443">
    <point/>
   </object>
-  <object id="155" name="bush" class="prop" x="468" y="446">
+  <object id="156" name="bush" class="prop" x="468" y="446">
    <point/>
   </object>
-  <object id="156" name="big_tree" class="prop" x="718" y="446">
+  <object id="157" name="big_tree" class="prop" x="718" y="446">
    <point/>
   </object>
-  <object id="157" name="big_tree" class="prop" x="320" y="453">
+  <object id="158" name="big_tree" class="prop" x="320" y="453">
    <point/>
   </object>
-  <object id="158" name="big_tree" class="prop" x="127" y="455">
+  <object id="159" name="big_tree" class="prop" x="127" y="455">
    <point/>
   </object>
-  <object id="159" name="pine" class="prop" x="225" y="457">
+  <object id="160" name="pine" class="prop" x="225" y="457">
    <point/>
   </object>
-  <object id="160" name="pine" class="prop" x="169" y="459">
+  <object id="161" name="pine" class="prop" x="169" y="459">
    <point/>
   </object>
-  <object id="161" name="big_tree" class="prop" x="684" y="459">
+  <object id="162" name="big_tree" class="prop" x="684" y="459">
    <point/>
   </object>
-  <object id="162" name="big_tree" class="prop" x="11" y="467">
+  <object id="163" name="big_tree" class="prop" x="11" y="467">
    <point/>
   </object>
-  <object id="163" name="big_tree" class="prop" x="646" y="468">
+  <object id="164" name="big_tree" class="prop" x="646" y="468">
    <point/>
   </object>
-  <object id="164" name="big_tree_b" class="prop" x="510" y="469">
+  <object id="165" name="big_tree_b" class="prop" x="510" y="469">
    <point/>
   </object>
-  <object id="165" name="small_tree" class="prop" x="71" y="470">
+  <object id="166" name="small_tree" class="prop" x="71" y="470">
    <point/>
   </object>
-  <object id="166" name="big_tree" class="prop" x="382" y="472">
+  <object id="167" name="big_tree" class="prop" x="382" y="472">
    <point/>
   </object>
+ </objectgroup>
+ <objectgroup id="7" name="lights">
+  <object id="168" name="shaft" class="light" x="256" y="256" width="48" height="144"/>
+  <object id="169" name="shaft" class="light" x="608" y="-16" width="48" height="144"/>
+  <object id="170" name="shaft" class="light" x="80" y="176" width="28" height="72"/>
+  <object id="171" name="shaft" class="light" x="256" y="96" width="28" height="72"/>
+  <object id="172" name="shaft" class="light" x="448" y="224" width="28" height="72"/>
+  <object id="173" name="shaft" class="light" x="656" y="144" width="28" height="72"/>
  </objectgroup>
 </map>

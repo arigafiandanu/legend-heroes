@@ -51,10 +51,10 @@ class Prop extends SpriteComponent {
   factory Prop({required PropSheet sheet, required String kind, required Vector2 base}) {
     final frame = sheet.frames[kind];
     if (frame == null) throw ArgumentError('unknown prop "$kind"');
-    return Prop._(sheet.image, frame, base);
+    return Prop._(sheet.image, kind, frame, base);
   }
 
-  Prop._(Image image, this.frame, Vector2 base)
+  Prop._(Image image, this.kind, this.frame, Vector2 base)
       : super(
           sprite: Sprite(image, srcPosition: frame.src.topLeft.toVector2(), srcSize: frame.src.size.toVector2()),
           position: base,
@@ -64,6 +64,7 @@ class Prop extends SpriteComponent {
     paint.filterQuality = FilterQuality.none;
   }
 
+  final String kind;
   final PropFrame frame;
 
   static final _shadowPaint = Paint()..color = const Color(0x55000000);

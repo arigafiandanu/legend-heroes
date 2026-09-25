@@ -30,7 +30,7 @@ Future<void> until(WidgetTester tester, bool Function() done, {int timeoutMs = 2
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('M2: new game, talk, loot, save, walk out, battle, then load back', (tester) async {
+  testWidgets('new game, talk, loot, save, walk out, battle, hidden chest, then load back', (tester) async {
     final docs = await getApplicationDocumentsDirectory();
     final saves = Directory('${docs.path}/saves');
     if (saves.existsSync()) saves.deleteSync(recursive: true);
@@ -151,6 +151,25 @@ void main() {
     await run(tester, 400); // let the map overlays rebuild
     final kael = game.state!.party.first;
     expect(kael.level > 1 || kael.exp > expBefore, isTrue, reason: 'EXP was awarded');
+
+    // East into the second Whisperwood map; Lira's [Ask] makes the hunter
+    // reveal a hidden chest.
+    await place(740, 200, Facing.right);
+    final g3 = await tester.startGesture(Offset(screen.width * 0.2, screen.height * 0.6));
+    await g3.moveBy(const Offset(60, 0));
+    await until(tester, () => game.map?.mapId == 'whisperwood_2' && !game.isBusy, what: 'whisperwood_2');
+    await g3.up();
+    await run(tester, 600); // screenshot: deeper forest
+    await place(484, 232, Facing.right);
+    await tester.tap(find.text('Action'));
+    await readDialog(choose: 0);
+    expect(game.state!.flags, contains('ww_secret'));
+    final feathers = game.state!.inventory.count('bulu_bara');
+    await place(248, 78, Facing.up);
+    await tester.tap(find.text('Action'));
+    await run(tester, 300);
+    expect(game.state!.openedChests, contains('whisperwood_2/chest_secret'));
+    expect(game.state!.inventory.count('bulu_bara'), feathers + 2);
 
     // Field menu shows items.
     await tester.tap(find.text('Menu'));
