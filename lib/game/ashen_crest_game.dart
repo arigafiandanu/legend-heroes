@@ -362,7 +362,10 @@ class AshenCrestGame extends FlameGame with KeyboardEvents implements DialogHost
       return;
     }
     map?.meter?.startSafePeriod(3);
-    overlays.addAll([Overlays.controls, Overlays.hud]);
+    // Overlays draw in the order they were added: put the dialog back on top
+    // of the controls, or the joystick area would swallow taps meant for it.
+    overlays.remove(Overlays.dialog);
+    overlays.addAll([Overlays.controls, Overlays.hud, Overlays.dialog]);
     final m = map;
     if (m != null) unawaited(bgm.play(m.bgm));
   }
